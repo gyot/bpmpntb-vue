@@ -1,0 +1,45 @@
+/.phpunit.cache
+/node_modules
+/public/build
+/public/hot
+/public/storage
+/storage/*.key
+/vendor
+.env
+.env.backup
+.env.production
+.phpunit.result.cache
+Homestead.json
+Homestead.yaml
+auth.json
+npm-debug.log
+yarn-error.log
+/.fleet
+/.idea
+/.vscode
+
+# Local files
+*.pdf
+*.png
+*.jpg
+!public/**/*.png
+!public/**/*.jpg
+!public/**/*.svg
+
+# Storage
+/storage/logs/*.log
+/storage/app/public/*
+!/storage/app/public/.gitkeep
+
+# Public uploads
+/public/upload/*
+!/public/upload/.gitkeep
+
+# Bootstrap cache
+/bootstrap/cache/*.php
+!/bootstrap/cache/.gitkeep
+
+# Misc
+*.pdf
+*.zip
+*.tar.gz

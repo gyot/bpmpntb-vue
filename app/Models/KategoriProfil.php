@@ -1,0 +1,1 @@
+<?php namespace App\Models; use Illuminate\Database\Eloquent\Model; class KategoriProfil extends Model { protected $table = 'kategoriprofil'; protected $fillable = ['title','slug','thumbnail','status','images']; }

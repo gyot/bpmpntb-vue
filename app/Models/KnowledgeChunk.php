@@ -1,0 +1,1 @@
+<?php namespace App\Models; use Illuminate\Database\Eloquent\Model; class KnowledgeChunk extends Model { protected $table = 'knowledge_chunks'; protected $guarded = []; protected $casts = ['embedding' => 'array']; }

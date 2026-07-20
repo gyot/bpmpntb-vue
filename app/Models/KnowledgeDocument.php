@@ -1,0 +1,1 @@
+<?php namespace App\Models; use Illuminate\Database\Eloquent\Model; class KnowledgeDocument extends Model { protected $table = 'knowledge_documents'; protected $guarded = []; public function category() { return $this->belongsTo(KnowledgeCategory::class, 'category_id'); } public function chunks() { return $this->hasMany(KnowledgeChunk::class, 'document_id'); } }
