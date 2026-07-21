@@ -6,13 +6,17 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="theme-color" content="#1e40af">
     <title>{{ config('app.name', 'BPMP NTB') }}</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
-    <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#1e40af">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="BPMP NTB">
+    <link rel="apple-touch-icon" href="/pwa/icon-192.png">
+    <link rel="stylesheet" href="/fonts/quicksand/quicksand.css">
+    <link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css">
+    <script src="/vendor/chartjs/chart.umd.js"></script>
+    <link rel="stylesheet" href="/vendor/quill/quill.snow.css">
+    <script src="/vendor/quill/quill.js"></script>
     <style>
         body{font-family:'Quicksand',system-ui,sans-serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}
         #app-loader{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#fff;z-index:9999;}

@@ -3,7 +3,7 @@
         <section class="relative w-full overflow-hidden" style="height:100vh;min-height:600px;max-height:1000px">
             <div class="absolute inset-0 flex transition-transform duration-700 ease-out" :style="{transform:`translateX(-${slide*100}%)`}">
                 <div class="flex-shrink-0 w-full h-full relative">
-                    <img src="/kantor_depan.jpg" alt="" class="w-full h-full object-cover" @error="$event.target.style.display='none'">
+                    <img src="/kantor_depan.jpg" alt="Kantor BPMP Provinsi NTB" class="w-full h-full object-cover" loading="eager" @error="$event.target.style.display='none'">
                     <div class="absolute inset-0" style="background:linear-gradient(to right, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.3) 50%, transparent 100%)"></div>
                     <div class="absolute inset-0 flex items-center">
                         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
@@ -28,7 +28,7 @@
                     </div>
                 </div>
                 <div v-for="s in sliders" :key="s.id" class="flex-shrink-0 w-full h-full relative">
-                    <img :src="s.image_url" :alt="s.title" class="w-full h-full object-cover">
+                    <img :src="s.image_url" :alt="s.title || 'Slider BPMP NTB'" class="w-full h-full object-cover" loading="lazy">
                     <div class="absolute inset-0" style="background:linear-gradient(to right, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.3) 50%, transparent 100%)"></div>
                     <div class="absolute inset-0 flex items-center">
                         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
@@ -66,13 +66,13 @@
                 <div class="grid grid-cols-2 lg:grid-cols-4 gap-5 max-w-4xl mx-auto">
                     <router-link v-for="item in kinerja" :key="item.label" :to="item.to" class="card p-6 text-center group">
                         <div class="w-14 h-14 rounded-2xl mx-auto mb-4 flex items-center justify-center transition-all group-hover:scale-110" style="background:color-mix(in srgb, var(--color-primary) 8%, transparent)">
-                            <img :src="item.img" class="h-8 w-8 object-contain" @error="$event.target.style.display='none'">
+                            <img :src="item.img" :alt="item.label" class="h-8 w-8 object-contain" loading="lazy" @error="$event.target.style.display='none'">
                         </div>
                         <div class="text-sm font-bold" style="color:var(--color-text-primary)">{{ item.label }}</div>
                     </router-link>
                     <a :href="setting?.ikm_link || '#'" target="_blank" class="card p-6 text-center group border-2" style="border-color:color-mix(in srgb, var(--color-accent) 30%, transparent)">
                         <div class="w-14 h-14 rounded-2xl mx-auto mb-3 flex items-center justify-center" style="background:color-mix(in srgb, var(--color-accent) 10%, transparent)">
-                            <img src="/ikm-2025.png" class="h-10 w-16 object-contain" @error="$event.target.style.display='none'">
+                            <img src="/ikm-2025.png" alt="Indeks Kepuasan Masyarakat" class="h-10 w-16 object-contain" loading="lazy" @error="$event.target.style.display='none'">
                         </div>
                         <div class="text-sm font-bold mb-1" style="color:var(--color-text-primary)">Indeks Kepuasan Masyarakat</div>
                         <div class="text-3xl font-extrabold" style="color:var(--color-accent)">{{ setting?.ikm_score || '0' }}</div>
@@ -97,7 +97,7 @@
                 </div>
                 <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
                     <component v-for="svc in layanan" :key="svc.id" :is="svc.link_type==='external'?'a':'router-link'" :href="svc.link_type==='external'?svc.link_url:undefined" :to="svc.link_type!=='external'?`/layanan/${svc.id}/${svc.slug}`:undefined" :target="svc.link_type==='external'?'_blank':undefined" class="card p-5 text-center group">
-                        <img v-if="svc.image" :src="'/upload/layanans/'+svc.image" class="h-14 mx-auto mb-3 group-hover:scale-110 transition-transform" @error="$event.target.style.display='none'">
+                        <img v-if="svc.image" :src="'/upload/layanans/'+svc.image" :alt="svc.title" class="h-14 mx-auto mb-3 group-hover:scale-110 transition-transform" loading="lazy" @error="$event.target.style.display='none'">
                         <div v-else class="w-14 h-14 mx-auto mb-3 rounded-xl flex items-center justify-center" style="background:color-mix(in srgb, var(--color-primary) 8%, transparent)"><i class="fas fa-concierge-bell text-2xl" style="color:var(--color-primary)"></i></div>
                         <h3 class="text-[11px] font-bold leading-tight" style="color:var(--color-text-primary)">{{ svc.title }}</h3>
                     </component>
@@ -119,7 +119,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                     <div v-for="item in lastPost" :key="item.id+item.jenis" class="card overflow-hidden group">
                         <div class="h-52 bg-gray-100 relative overflow-hidden">
-                            <img v-if="item.image_url" :src="item.image_url" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" @error="handleThumbError($event,item)">
+                            <img v-if="item.image_url" :src="item.image_url" :alt="item.title" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" @error="handleThumbError($event,item)">
                             <div v-else class="w-full h-full flex items-center justify-center bg-gray-50">
                                 <i class="fas fa-newspaper text-4xl text-gray-200"></i>
                             </div>

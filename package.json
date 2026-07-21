@@ -14,7 +14,10 @@
         "vite": "^5.0.0"
     },
     "dependencies": {
+        "@fortawesome/fontawesome-free": "^7.3.1",
         "@vitejs/plugin-vue": "^6.0.7",
+        "chart.js": "^4.5.1",
+        "quill": "^2.0.3",
         "sweetalert2": "^11.26.25",
         "vue": "^3.5.39",
         "vue-router": "^4.6.4"

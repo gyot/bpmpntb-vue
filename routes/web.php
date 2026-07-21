@@ -1,7 +1,36 @@
 <?php
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\{PdfController, IntentController, KnowledgeBaseController, AiSettingsController};
 use App\Http\Controllers\Api\ChatbotController;
+
+// SEO: Sitemap
+Route::get('/sitemap.xml', function () {
+    $baseUrl = config('app.url');
+    $types = ['berita','artikel','buletin','jurnal','kliping','pengumuman','galeri','unduhan'];
+    $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+    $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
+    $xml .= "  <url><loc>{$baseUrl}/</loc><changefreq>daily</changefreq><priority>1.0</priority></url>\n";
+    $xml .= "  <url><loc>{$baseUrl}/ppid</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>\n";
+    foreach ($types as $jenis) {
+        $xml .= "  <url><loc>{$baseUrl}/post/{$jenis}</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>\n";
+        $posts = DB::table($jenis)->where('status', 1)->select('id', 'slug', 'updated_at')->orderByDesc('updated_at')->limit(200)->get();
+        foreach ($posts as $post) {
+            $lastmod = $post->updated_at ? date('Y-m-d', strtotime($post->updated_at)) : date('Y-m-d');
+            $slug = $post->slug ? urlencode($post->slug) : $post->id;
+            $xml .= "  <url><loc>{$baseUrl}/post/{$jenis}/{$post->id}/{$slug}</loc><lastmod>{$lastmod}</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>\n";
+        }
+    }
+    $xml .= '</urlset>';
+    return response($xml, 200)->header('Content-Type', 'application/xml');
+});
+
+// SEO: Robots.txt
+Route::get('/robots.txt', function () {
+    $url = config('app.url');
+    $txt = "User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /api\n\nSitemap: {$url}/sitemap.xml\n";
+    return response($txt, 200)->header('Content-Type', 'text/plain');
+});
 
 Route::get('/post/{jenis}/{id}/pdf', [PdfController::class, 'cetak'])->name('post.pdf');
 Route::get('/post/{jenis}/{id}/cetak', [PdfController::class, 'cetak'])->name('post.cetak');

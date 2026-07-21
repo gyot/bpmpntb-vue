@@ -1,0 +1,29 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Offline - BPMP NTB</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Quicksand',system-ui,sans-serif;background:#f8fafc;color:#1e293b;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+.box{text-align:center;max-width:420px}
+.icon{font-size:72px;margin-bottom:20px;opacity:0.6}
+h1{font-size:24px;font-weight:700;margin-bottom:8px;color:#0f172a}
+p{color:#64748b;margin-bottom:24px;line-height:1.7;font-size:14px}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 28px;background:linear-gradient(135deg,#2563eb,#3b82f6);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;text-decoration:none;transition:all .2s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(37,99,235,0.3)}
+.status{margin-top:24px;font-size:12px;color:#94a3b8}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#ef4444;margin-right:6px}
+</style>
+</head>
+<body>
+<div class="box">
+<div class="icon">&#128268;</div>
+<h1>Anda Sedang Offline</h1>
+<p>Koneksi internet tidak tersedia. Beberapa halaman mungkin masih bisa diakses dari cache. Silakan periksa koneksi Anda dan coba lagi.</p>
+<button class="btn" onclick="location.reload()">&#8635; Coba Lagi</button>
+<div class="status"><span class="dot"></span>Tidak terhubung ke server</div>
+</div>
+</body>
+</html>

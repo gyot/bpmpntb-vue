@@ -34,9 +34,9 @@
     <div class="chat-box" ref="chatBox" @scroll="onScroll">
         <div v-if="!identitySaved" class="identity-form">
             <div class="text-center mb-3"><div class="text-2xl mb-1">👋</div><div class="font-bold text-sm">Selamat Datang!</div><div class="text-xs text-gray-500">Isi identitas untuk memulai</div></div>
-            <input v-model="identity.nama" placeholder="Nama Lengkap" class="chat-input">
-            <input v-model="identity.instansi" placeholder="Asal Sekolah/Instansi" class="chat-input">
-            <input v-model="identity.kontak" placeholder="No Whatsapp Aktif" class="chat-input">
+            <input v-model="identity.nama" placeholder="Nama Lengkap" class="chat-input" aria-label="Nama Lengkap" required>
+            <input v-model="identity.instansi" placeholder="Asal Sekolah/Instansi" class="chat-input" aria-label="Asal Sekolah atau Instansi">
+            <input v-model="identity.kontak" placeholder="No Whatsapp Aktif" class="chat-input" aria-label="Nomor WhatsApp Aktif">
             <button @click="submitIdentity" class="chat-start-btn">Mulai Chat dengan INTAN</button>
         </div>
 
@@ -81,7 +81,7 @@
         <div class="relative"><button type="button" @click="showEmoji=!showEmoji" class="emoji-btn">😊</button>
             <div v-if="showEmoji" class="emoji-popup"><span v-for="e in emojis" :key="e" @click="insertEmoji(e)" class="emoji-item">{{ e }}</span></div>
         </div>
-        <input v-model="input" type="text" placeholder="Ketik pesan..." class="chat-msg-input" :disabled="streaming||botTyping">
+        <input v-model="input" type="text" placeholder="Ketik pesan..." class="chat-msg-input" :disabled="streaming||botTyping" aria-label="Ketik pesan chatbot">
         <button type="submit" :disabled="!input.trim()||streaming||botTyping" class="chat-send-btn"><i class="fas fa-paper-plane"></i></button>
     </form>
 </div>

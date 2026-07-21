@@ -1,5 +1,6 @@
 ﻿<template>
     <div class="min-h-screen flex flex-col">
+        <a href="#main-content" class="skip-link">Langsung ke konten utama</a>
         <header class="fixed top-0 left-0 right-0 z-50 transition-all duration-500" :class="scrolled ? 'shadow-md' : ''" :style="headerStyle" role="banner" aria-label="Header utama">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex items-center justify-between h-16 lg:h-[72px]">
@@ -215,7 +216,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
                         <div>
                             <div class="mb-5">
-                                <img v-if="setting?.logo" :src="'/upload/settings/' + setting.logo" class="h-12" alt="">
+                                <img v-if="setting?.logo" :src="'/upload/settings/' + setting.logo" class="h-12" :alt="setting?.title || 'Logo BPMP NTB'" loading="lazy">
                             </div>
                             <p class="text-sm text-white/70 leading-relaxed mb-2 font-semibold">{{ setting?.title || 'BPMP Provinsi NTB' }}</p>
                             <p class="text-sm text-white/50 leading-relaxed whitespace-pre-line mb-5">{{ setting?.alamat }}</p>
@@ -508,4 +509,6 @@ header:not([style*="transparent"]) .nav-link-active { color: #fff; background: r
 .mm-expand-leave-active { transition: all .2s ease; overflow: hidden; }
 .mm-expand-enter-from, .mm-expand-leave-to { opacity: 0; max-height: 0; }
 .mm-expand-enter-to, .mm-expand-leave-from { max-height: 600px; }
+.skip-link { position: fixed; top: -100px; left: 16px; z-index: 99999; background: var(--color-primary, #2563eb); color: #fff; padding: 12px 20px; border-radius: 0 0 12px 12px; font-size: 14px; font-weight: 700; text-decoration: none; transition: top .2s; }
+.skip-link:focus { top: 0; }
 </style>

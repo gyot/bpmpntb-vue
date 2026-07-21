@@ -27,11 +27,11 @@
         <main class="lp-right">
             <div class="lp-card animate-slide-up">
                 <div class="lp-card-header">
-                    <div class="lp-logo-wrap">
-                        <img v-if="setting?.logo" :src="'/upload/settings/' + setting.logo" class="lp-logo-img" alt="Logo">
-                        <i v-else class="fas fa-shield-halved lp-logo-icon"></i>
+                    <img v-if="setting?.logo" :src="'/upload/settings/' + setting.logo"  alt="Logo">
+                    <!-- <div v-else class="lp-logo-wrap">
+                        <i class="fas fa-shield-halved lp-logo-icon"></i>
                     </div>
-                    <h1 class="lp-title">{{ setting?.title || 'BPMP Provinsi NTB' }}</h1>
+                    <h1 class="lp-title">{{ setting?.title || 'BPMP Provinsi NTB' }}</h1> -->
                     <p class="lp-subtitle">Masuk ke panel admin</p>
                 </div>
 

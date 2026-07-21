@@ -295,7 +295,7 @@ body{letter-spacing:var(--a11y-letter-spacing,0)!important;word-spacing:var(--a1
 
 /* Font */
 body.a11y-dyslexia,body.a11y-dyslexia *{font-family:'OpenDyslexic','Comic Sans MS',cursive!important}
-@font-face{font-family:'OpenDyslexic';src:url('https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/woff/OpenDyslexic-Regular.woff') format('woff');font-weight:normal}
+@font-face{font-family:'OpenDyslexic';src:url('/fonts/opendyslexic/OpenDyslexic-Regular.woff') format('woff');font-weight:normal}
 
 /* Cursor */
 body.a11y-big-cursor,body.a11y-big-cursor *{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Ccircle cx='16' cy='16' r='14' fill='rgba(0,0,0,0.7)' stroke='white' stroke-width='2'/%3E%3C/svg%3E") 16 16,auto!important}

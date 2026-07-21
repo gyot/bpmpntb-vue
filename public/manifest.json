@@ -1,0 +1,27 @@
+﻿{
+    "name": "BPMP Provinsi NTB",
+    "short_name": "BPMP NTB",
+    "description": "Website Resmi Balai Penjaminan Mutu Pendidikan Provinsi Nusa Tenggara Barat",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#1e40af",
+    "orientation": "any",
+    "scope": "/",
+    "lang": "id",
+    "categories": ["education", "government"],
+    "icons": [
+        {
+            "src": "/pwa/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/pwa/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ]
+}
