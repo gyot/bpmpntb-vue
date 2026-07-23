@@ -1,7 +1,7 @@
 <?php
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\{AuthController, BerandaController, PostController, SliderController, SettingController, UserController, ExternalLinkController, LayananController, ChatbotController, PpidController};
+use App\Http\Controllers\Api\{AuthController, BerandaController, PostController, SliderController, SettingController, UserController, ExternalLinkController, LayananController, ChatbotController, PpidController, ExportImportController};
 
 Route::get('/beranda', [BerandaController::class, 'index']);
 Route::get('/settings', [BerandaController::class, 'settings']);
@@ -85,4 +85,16 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::delete('/ai-configs/{id}', [ChatbotController::class, 'aiConfigDestroy']);
     Route::post('/ai-configs/{id}/test', [ChatbotController::class, 'aiConfigTest']);
     Route::get('/chatbot-analytics', [ChatbotController::class, 'analytics']);
+
+    // WhatsApp Broadcast
+    Route::post('/wa-broadcast/send', [ChatbotController::class, 'broadcastSend']);
+    Route::post('/wa-broadcast/send-stream', [ChatbotController::class, 'broadcastSendStream']);
+    Route::get('/wa-broadcast/users', [ChatbotController::class, 'broadcastUsers']);
+    Route::get('/wa-broadcast/history', [ChatbotController::class, 'broadcastHistory']);
+
+    // Export/Import
+    Route::get('/export-import/types', [ExportImportController::class, 'types']);
+    Route::get('/export-import/{type}/template', [ExportImportController::class, 'downloadTemplate']);
+    Route::get('/export-import/{type}', [ExportImportController::class, 'export']);
+    Route::post('/export-import/{type}', [ExportImportController::class, 'import']);
 });

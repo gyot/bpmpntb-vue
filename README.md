@@ -423,14 +423,18 @@ resources/js/
 
 ### 12.3 Menambah Halaman Baru
 
-1. Buat file di esources/js/pages/admin/YourPage.vue
-2. Tambah route di esources/js/router/index.js
-3. Tambah menu di esources/js/layouts/AdminLayout.vue (allMenuGroups)
+1. Buat file di 
+esources/js/pages/admin/YourPage.vue
+2. Tambah route di 
+esources/js/router/index.js
+3. Tambah menu di 
+esources/js/layouts/AdminLayout.vue (allMenuGroups)
 4. Tambah key di UserController@menus (allMenus array)
 
 ### 12.4 Menambah Komponen
 
-1. Buat file di esources/js/components/YourComponent.vue
+1. Buat file di 
+esources/js/components/YourComponent.vue
 2. Import di halaman yang membutuhkan
 3. Gunakan <script setup> untuk Composition API
 
@@ -443,14 +447,16 @@ resources/js/
 1. **Migration:** php artisan make:migration create_xxx_table
 2. **Model:** php artisan make:model Xxx
 3. **Controller:** php artisan make:controller Api/XxxController --api
-4. **Route:** Tambah di outes/api.php
+4. **Route:** Tambah di 
+outes/api.php
 5. **Middleware:** Gunakan uth:sanctum dan dmin untuk rute admin
 
 ### 13.2 Conventions
 
 - Controller API di pp/Http/Controllers/Api/
 - Validasi inline di controller (tanpa Form Request)
-- Response: esponse()->json([...])
+- Response: 
+esponse()->json([...])
 - Model di pp/Models/
 - Foreign key: oreignId()->constrained()
 
@@ -496,8 +502,12 @@ Struktur direktori di hosting:
 `
 
 Ubah public/index.php:
-- equire __DIR__.'/../vendor/autoload.php' menjadi equire __DIR__.'/../laravel/vendor/autoload.php'
-- equire_once __DIR__.'/../bootstrap/app.php' menjadi equire_once __DIR__.'/../laravel/bootstrap/app.php'
+- 
+equire __DIR__.'/../vendor/autoload.php' menjadi 
+equire __DIR__.'/../laravel/vendor/autoload.php'
+- 
+equire_once __DIR__.'/../bootstrap/app.php' menjadi 
+equire_once __DIR__.'/../laravel/bootstrap/app.php'
 
 ### 14.3 Perintah di Hosting (SSH)
 
