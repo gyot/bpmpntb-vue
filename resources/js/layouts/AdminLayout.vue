@@ -65,18 +65,25 @@ const contentTypes = ['berita', 'artikel', 'buletin', 'jurnal', 'kliping', 'peng
 const allMenuGroups = [
     {
         key: 'konten', label: 'Konten', icon: 'fas fa-newspaper', open: false,
-        items: contentTypes.map(j => ({ label: capitalize(j), to: `/admin/konten/${j}` }))
+        items: [
+            ...contentTypes.map(j => ({ label: capitalize(j), to: `/admin/konten/${j}` })),
+            { label: 'Export/Import', to: '/admin/export-import/konten', icon: 'fas fa-exchange-alt' }
+        ]
     },
     {
         key: 'kategori', label: 'Kategori', icon: 'fas fa-tags', open: false,
-        items: contentTypes.map(j => ({ label: capitalize(j), to: `/admin/kategori/${j}` }))
+        items: [
+            ...contentTypes.map(j => ({ label: capitalize(j), to: `/admin/kategori/${j}` })),
+            { label: 'Export/Import', to: '/admin/export-import/kategori', icon: 'fas fa-exchange-alt' }
+        ]
     },
     {
         key: 'media', label: 'Media', icon: 'fas fa-photo-video', open: false,
         items: [
             { label: 'Sliders', to: '/admin/sliders' },
             { label: 'Layanan', to: '/admin/layanans' },
-            { label: 'Link Eksternal', to: '/admin/external-links' }
+            { label: 'Link Eksternal', to: '/admin/external-links' },
+            { label: 'Export/Import', to: '/admin/export-import/media', icon: 'fas fa-exchange-alt' }
         ]
     },
     {
@@ -88,19 +95,31 @@ const allMenuGroups = [
             { label: 'Analytics', to: '/admin/chatbot/analytics' },
             { label: 'Knowledge Base', to: '/admin/chatbot/knowledge-base' },
             { label: 'Konfigurasi AI', to: '/admin/ai-config' },
-            { label: 'WhatsApp Gateway', to: '/admin/chatbot/whatsapp' }
+            { label: 'WhatsApp Gateway', to: '/admin/chatbot/whatsapp' },
+            { label: 'Export/Import', to: '/admin/export-import/chatbot', icon: 'fas fa-exchange-alt' }
+        ]
+    },
+    {
+        key: 'broadcast', label: 'Broadcast', icon: 'fas fa-bullhorn', open: false,
+        items: [
+            { label: 'WhatsApp Broadcast', to: '/admin/wa-broadcast' },
+            { label: 'Export/Import', to: '/admin/export-import/broadcast', icon: 'fas fa-exchange-alt' }
         ]
     },
     {
         key: 'ppid', label: 'PPID', icon: 'fas fa-university', open: false,
-        items: [{ label: 'Kelola PPID', to: '/admin/ppid' }]
+        items: [
+            { label: 'Kelola PPID', to: '/admin/ppid' },
+            { label: 'Export/Import', to: '/admin/export-import/ppid', icon: 'fas fa-exchange-alt' }
+        ]
     },
     {
         key: 'pengaturan', label: 'Pengaturan', icon: 'fas fa-cog', open: false,
         items: [
             { label: 'Website', to: '/admin/settings' },
             { label: 'Tema Website', to: '/admin/theme' },
-            { label: 'Users', to: '/admin/users' }
+            { label: 'Users', to: '/admin/users' },
+            { label: 'Export/Import', to: '/admin/export-import/pengaturan', icon: 'fas fa-exchange-alt' }
         ]
     }
 ];
@@ -123,7 +142,7 @@ onMounted(async () => {
         const { data } = await api.get('/my-menu-access');
         allowedMenus.value = data || [];
     } catch (e) {
-        allowedMenus.value = ['dashboard','konten','kategori','media','chatbot','ppid','pengaturan'];
+        allowedMenus.value = ['dashboard','konten','kategori','media','chatbot','broadcast','ppid','pengaturan'];
     }
 });
 

@@ -16,6 +16,7 @@ class UserController extends Controller
         'kategori' => 'Kategori',
         'media' => 'Media',
         'chatbot' => 'Si Intan',
+        'broadcast' => 'Broadcast',
         'ppid' => 'PPID',
         'pengaturan' => 'Pengaturan',
     ];

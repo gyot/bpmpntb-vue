@@ -29,8 +29,10 @@ const routes = [
             { path: 'chatbot/knowledge-base', name: 'admin.knowledge-base', component: () => import('@/pages/admin/KnowledgeBase.vue') },
             { path: 'ai-config', name: 'admin.ai-config', component: () => import('@/pages/admin/AiConfigManager.vue') },
             { path: 'chatbot/whatsapp', name: 'admin.whatsapp', component: () => import('@/pages/admin/WhatsAppSettings.vue') },
+            { path: 'wa-broadcast', name: 'admin.wa-broadcast', component: () => import('@/pages/admin/WaBroadcast.vue') },
             { path: 'ppid', name: 'admin.ppid', component: () => import('@/pages/admin/PpidManager.vue') },
             { path: 'kategori/:jenis', name: 'admin.kategori', component: () => import('@/pages/admin/KategoriManager.vue') },
+            { path: 'export-import/:group', name: 'admin.export-import', component: () => import('@/pages/admin/ExportImport.vue') },
         ],
     },
 ];

@@ -405,6 +405,7 @@ class ChatbotController extends Controller
     {
         return response()->stream(function() use ($cb) {
             @ini_set('output_buffering','off'); @ini_set('zlib.output_compression',false);
+            @set_time_limit(0);
             while (ob_get_level()>0) ob_end_flush();
             if (function_exists('apache_setenv')) @apache_setenv('no-gzip','1');
             ob_implicit_flush(true); $cb();
@@ -830,5 +831,220 @@ class ChatbotController extends Controller
         $sessionId = $request->input('session_id');
         DB::table('chat_messages')->where('session_id',$sessionId)->where('sender_type','user')->where('is_read',false)->update(['is_read'=>true,'updated_at'=>now()]);
         return response()->json(['status'=>'ok']);
+    }
+
+    // ===== WHATSAPP BROADCAST =====
+    private function normalizePhone(string $raw): string
+    {
+        $s = preg_replace('/[^0-9]/', '', $raw);
+        if (strlen($s) < 8) return $s;
+        if (str_starts_with($s, '62')) {
+            $s = '62' . ltrim(substr($s, 2), '0');
+        } elseif (str_starts_with($s, '0')) {
+            $s = '62' . substr($s, 1);
+        } elseif (strlen($s) >= 9 && strlen($s) <= 13 && !str_starts_with($s, '62')) {
+            $s = '62' . $s;
+        }
+        return $s;
+    }
+
+    private function personalizeMessage(string $template, array $contact): string
+    {
+        $msg = str_replace('{nama}', $contact['nama'] ?? '', $template);
+        if (!empty($contact['extra']) && is_array($contact['extra'])) {
+            foreach ($contact['extra'] as $key => $val) {
+                $msg = str_replace('{' . $key . '}', $val, $msg);
+            }
+        }
+        return $msg;
+    }
+
+    public function broadcastSend(Request $request)
+    {
+        $v = $request->validate([
+            'contacts' => 'required|array|min:1|max:200',
+            'contacts.*.number' => 'required|string|max:20',
+            'contacts.*.nama' => 'nullable|string|max:255',
+            'contacts.*.extra' => 'nullable|array',
+            'message' => 'required|string|max:5000',
+        ]);
+
+        $domain = $this->getWASetting('wa_domain', 'https://wapi1.gdoank.my.id');
+        $results = [];
+        $sentCount = 0;
+
+        foreach ($v['contacts'] as $contact) {
+            $number = $this->normalizePhone($contact['number']);
+            $nama = $contact['nama'] ?? '';
+            if (strlen($number) < 10) {
+                $results[] = ['number' => $number, 'nama' => $nama, 'success' => false, 'error' => 'Nomor tidak valid'];
+                continue;
+            }
+            $personalizedMsg = $this->personalizeMessage($v['message'], $contact);
+            try {
+                $response = Http::timeout(10)->post($domain . '/api/whatsapp/send-message', [
+                    'number' => $number . '@c.us',
+                    'message' => $personalizedMsg,
+                ]);
+                if ($response->successful()) {
+                    $results[] = ['number' => $number, 'nama' => $nama, 'success' => true];
+                    $sentCount++;
+                } else {
+                    $results[] = ['number' => $number, 'nama' => $nama, 'success' => false, 'error' => 'HTTP ' . $response->status()];
+                }
+            } catch (\Throwable $e) {
+                $results[] = ['number' => $number, 'nama' => $nama, 'success' => false, 'error' => $e->getMessage()];
+            }
+            sleep(rand(35, 70));
+        }
+
+        try {
+            if (Schema::hasTable('wa_broadcast_logs')) {
+                    DB::table('wa_broadcast_logs')->insert([
+                        'message' => $v['message'],
+                        'total_numbers' => count($v['contacts']),
+                        'total_sent' => $sentCount,
+                        'results' => json_encode($results),
+                        'admin_id' => $request->user()?->id,
+                        'created_at' => now(),
+                    ]);
+            }
+        } catch (\Throwable $e) {
+            Log::warning('Broadcast log failed: ' . $e->getMessage());
+        }
+
+        return response()->json(['status' => 'ok', 'results' => $results, 'total' => count($v['contacts']), 'sent' => $sentCount]);
+    }
+
+    public function broadcastSendStream(Request $request)
+    {
+        $v = $request->validate([
+            'contacts' => 'required|array|min:1|max:200',
+            'contacts.*.number' => 'required|string|max:20',
+            'contacts.*.nama' => 'nullable|string|max:255',
+            'contacts.*.extra' => 'nullable|array',
+            'message' => 'required|string|max:5000',
+        ]);
+
+        $domain = $this->getWASetting('wa_domain', 'https://wapi1.gdoank.my.id');
+        $contacts = $v['contacts'];
+        $template = $v['message'];
+        $total = count($contacts);
+        $adminId = $request->user()?->id;
+
+        return response()->stream(function() use ($domain, $contacts, $template, $total, $adminId) {
+            @ini_set('output_buffering', 'off');
+            @ini_set('zlib.output_compression', false);
+            @set_time_limit(0);
+            while (ob_get_level() > 0) ob_end_flush();
+            if (function_exists('apache_setenv')) @apache_setenv('no-gzip', '1');
+            ob_implicit_flush(true);
+
+            $sendSse = function(array $data) {
+                echo "data: " . json_encode($data) . "\n\n";
+                if (ob_get_level() > 0) ob_flush();
+                flush();
+                if (function_exists('fastcgi_finish_request')) fastcgi_finish_request();
+            };
+
+            $sentCount = 0;
+            $results = [];
+
+            $sendSse(['type' => 'start', 'total' => $total]);
+            Log::info("Broadcast SSE started: {$total} contacts, domain={$domain}");
+
+            foreach ($contacts as $i => $contact) {
+                $number = $this->normalizePhone($contact['number']);
+                $nama = $contact['nama'] ?? '';
+                $result = ['number' => $number, 'nama' => $nama, 'index' => $i];
+
+                if (strlen($number) < 10) {
+                    $result['success'] = false;
+                    $result['error'] = 'Nomor tidak valid';
+                } else {
+                    $personalizedMsg = $this->personalizeMessage($template, $contact);
+                    $result['message'] = $personalizedMsg;
+                    try {
+                        Log::info("Broadcast sending to {$number}@c.us");
+                        $response = Http::timeout(30)->post($domain . '/api/whatsapp/send-message', [
+                            'number' => $number . '@c.us',
+                            'message' => $personalizedMsg,
+                        ]);
+                        Log::info("Broadcast response for {$number}: status={$response->status()}");
+                        if ($response->successful()) {
+                            $result['success'] = true;
+                            $sentCount++;
+                        } else {
+                            $result['success'] = false;
+                            $result['error'] = 'HTTP ' . $response->status() . ' - ' . $response->body();
+                        }
+                    } catch (\Throwable $e) {
+                        Log::error("Broadcast error for {$number}: " . $e->getMessage());
+                        $result['success'] = false;
+                        $result['error'] = $e->getMessage();
+                    }
+                }
+
+                if (!isset($result['message'])) {
+                    $result['message'] = $this->personalizeMessage($template, $contact);
+                }
+
+                $results[] = $result;
+                $current = $i + 1;
+                $sendSse(['type' => 'progress', 'current' => $current, 'total' => $total, 'sent' => $sentCount, 'result' => $result]);
+
+                if ($current < $total) {
+                    $delay = rand(35, 70);
+                    $sendSse(['type' => 'waiting', 'delay' => $delay, 'current' => $current, 'total' => $total]);
+                    sleep($delay);
+                }
+            }
+
+            try {
+                if (Schema::hasTable('wa_broadcast_logs')) {
+                    DB::table('wa_broadcast_logs')->insert([
+                        'message' => $template,
+                        'total_numbers' => $total,
+                        'total_sent' => $sentCount,
+                        'results' => json_encode($results),
+                        'admin_id' => $adminId,
+                        'created_at' => now(),
+                    ]);
+                }
+            } catch (\Throwable $e) {
+                Log::warning('Broadcast log failed: ' . $e->getMessage());
+            }
+
+            Log::info("Broadcast SSE done: {$sentCount}/{$total} sent");
+            $sendSse(['type' => 'done', 'total' => $total, 'sent' => $sentCount, 'results' => $results]);
+        }, 200, [
+            'Content-Type' => 'text/event-stream',
+            'Cache-Control' => 'no-cache',
+            'X-Accel-Buffering' => 'no',
+            'Connection' => 'keep-alive',
+        ]);
+    }
+
+    public function broadcastUsers()
+    {
+        $numbers = DB::table('chatbot_user')
+            ->whereNotNull('kontak')
+            ->where('kontak', '!=', '')
+            ->pluck('kontak')
+            ->map(fn($n) => preg_replace('/[^0-9]/', '', $n))
+            ->filter(fn($n) => strlen($n) >= 8)
+            ->unique()
+            ->values();
+        return response()->json(['users' => $numbers]);
+    }
+
+    public function broadcastHistory()
+    {
+        if (!Schema::hasTable('wa_broadcast_logs')) return response()->json([]);
+        $history = DB::table('wa_broadcast_logs')
+            ->orderByDesc('id')
+            ->limit(20)
+            ->get();
+        return response()->json($history);
     }
 }
