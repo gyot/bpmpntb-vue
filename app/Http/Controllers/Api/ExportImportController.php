@@ -20,6 +20,9 @@ class ExportImportController extends Controller
         'konten-galeri' => 'galeri',
         'konten-unduhan' => 'unduhan',
         'konten-profil' => 'profil',
+        'konten-renstra' => 'renstra',
+        'konten-lakin' => 'lakin',
+        'konten-perjanjian_kinerja' => 'perjanjian_kinerja',
         'kategori-berita' => 'kategoriberita',
         'kategori-artikel' => 'kategoriartikel',
         'kategori-buletin' => 'kategoribuletin',
@@ -29,6 +32,9 @@ class ExportImportController extends Controller
         'kategori-galeri' => 'kategorigaleri',
         'kategori-unduhan' => 'kategoriunduhan',
         'kategori-profil' => 'kategoriprofil',
+        'kategori-renstra' => 'kategorirenstra',
+        'kategori-lakin' => 'kategorilakin',
+        'kategori-perjanjian_kinerja' => 'kategoriperjanjian_kinerja',
         'sliders' => 'sliders',
         'layanans' => 'layanans',
         'external-links' => 'externallink',
@@ -55,6 +61,9 @@ class ExportImportController extends Controller
         'konten-galeri' => 'Galeri',
         'konten-unduhan' => 'Unduhan',
         'konten-profil' => 'Profil',
+        'konten-renstra' => 'Renstra',
+        'konten-lakin' => 'Laporan Kinerja',
+        'konten-perjanjian_kinerja' => 'Perjanjian Kinerja',
         'kategori-berita' => 'Kategori Berita',
         'kategori-artikel' => 'Kategori Artikel',
         'kategori-buletin' => 'Kategori Buletin',
@@ -64,6 +73,9 @@ class ExportImportController extends Controller
         'kategori-galeri' => 'Kategori Galeri',
         'kategori-unduhan' => 'Kategori Unduhan',
         'kategori-profil' => 'Kategori Profil',
+        'kategori-renstra' => 'Kategori Renstra',
+        'kategori-lakin' => 'Kategori Laporan Kinerja',
+        'kategori-perjanjian_kinerja' => 'Kategori Perjanjian Kinerja',
         'sliders' => 'Sliders',
         'layanans' => 'Layanan',
         'external-links' => 'Link Eksternal',
@@ -83,6 +95,7 @@ class ExportImportController extends Controller
     private array $kontenTypes = [
         'konten-berita', 'konten-artikel', 'konten-buletin', 'konten-jurnal',
         'konten-kliping', 'konten-pengumuman', 'konten-galeri', 'konten-unduhan', 'konten-profil',
+        'konten-renstra', 'konten-lakin', 'konten-perjanjian_kinerja',
     ];
 
     private function getJenisFromType(string $type): string

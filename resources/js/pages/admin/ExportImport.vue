@@ -138,8 +138,8 @@ const dateFrom = ref('');
 const dateTo = ref('');
 
 const groupMap = {
-    'konten': ['konten-berita','konten-artikel','konten-buletin','konten-jurnal','konten-kliping','konten-pengumuman','konten-galeri','konten-unduhan','konten-profil'],
-    'kategori': ['kategori-berita','kategori-artikel','kategori-buletin','kategori-jurnal','kategori-kliping','kategori-pengumuman','kategori-galeri','kategori-unduhan','kategori-profil'],
+    'konten': ['konten-berita','konten-artikel','konten-buletin','konten-jurnal','konten-kliping','konten-pengumuman','konten-galeri','konten-unduhan','konten-profil','konten-renstra','konten-lakin','konten-perjanjian_kinerja'],
+    'kategori': ['kategori-berita','kategori-artikel','kategori-buletin','kategori-jurnal','kategori-kliping','kategori-pengumuman','kategori-galeri','kategori-unduhan','kategori-profil','kategori-renstra','kategori-lakin','kategori-perjanjian_kinerja'],
     'media': ['sliders','layanans','external-links'],
     'chatbot': ['chatbot-responses','chatbot-intents','ai-configs','chatbot-settings'],
     'broadcast': ['broadcast'],

@@ -59,8 +59,8 @@ const user = ref(null);
 const setting = ref(null);
 const allowedMenus = ref([]);
 
-const capitalize = s => s.charAt(0).toUpperCase() + s.slice(1);
-const contentTypes = ['berita', 'artikel', 'buletin', 'jurnal', 'kliping', 'pengumuman', 'galeri', 'unduhan', 'profil'];
+const capitalize = s => s.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+const contentTypes = ['berita', 'artikel', 'buletin', 'jurnal', 'kliping', 'pengumuman', 'galeri', 'unduhan', 'profil', 'renstra', 'lakin', 'perjanjian_kinerja'];
 
 const allMenuGroups = [
     {

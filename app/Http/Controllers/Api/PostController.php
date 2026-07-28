@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
-use App\Models\{Artikel, Berita, Buletin, Jurnal, Kliping, Pengumuman, Galeri, Unduhan, Profil, HelperData};
+use App\Models\{Artikel, Berita, Buletin, Jurnal, Kliping, Pengumuman, Galeri, Unduhan, Profil, Renstra, Lakin, PerjanjianKinerja, HelperData};
 use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver as GdDriver;
 
@@ -25,6 +25,9 @@ class PostController extends Controller
             'galeri' => new Galeri,
             'unduhan' => new Unduhan,
             'profil' => new Profil,
+            'renstra' => new Renstra,
+            'lakin' => new Lakin,
+            'perjanjian_kinerja' => new PerjanjianKinerja,
             default => null,
         };
     }
@@ -41,6 +44,9 @@ class PostController extends Controller
             'galeri' => \App\Models\KategoriGaleri::class,
             'unduhan' => \App\Models\KategoriUnduhan::class,
             'profil' => \App\Models\KategoriProfil::class,
+            'renstra' => \App\Models\KategoriRenstra::class,
+            'lakin' => \App\Models\KategoriLakin::class,
+            'perjanjian_kinerja' => \App\Models\KategoriPerjanjianKinerja::class,
         ];
         return $map[$jenis] ?? null;
     }
@@ -330,7 +336,7 @@ class PostController extends Controller
 
     public function dashboardStats(Request $request)
     {
-        $types = ['artikel', 'berita', 'buletin', 'jurnal', 'kliping', 'pengumuman', 'galeri', 'unduhan'];
+        $types = ['artikel', 'berita', 'buletin', 'jurnal', 'kliping', 'pengumuman', 'galeri', 'unduhan', 'renstra', 'lakin', 'perjanjian_kinerja'];
         $year = (int) $request->get('year', Carbon::now()->year);
         $monthNames = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
 
