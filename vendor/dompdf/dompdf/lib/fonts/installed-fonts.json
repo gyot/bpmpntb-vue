@@ -1,0 +1,28 @@
+{
+    "inter": {
+        "300": "C:\\Users\\MyPC One Pro L\\Documents\\website\\grafik\\bpmpntb-vue\\vendor\\dompdf\\dompdf\/lib\/fonts\/inter_300_07dabb19b170e3852ebdf10a85924e18",
+        "normal": "C:\\Users\\MyPC One Pro L\\Documents\\website\\grafik\\bpmpntb-vue\\vendor\\dompdf\\dompdf\/lib\/fonts\/inter_normal_5a66f8ceb794f00a7f54c797a21283b3",
+        "500": "C:\\Users\\MyPC One Pro L\\Documents\\website\\grafik\\bpmpntb-vue\\vendor\\dompdf\\dompdf\/lib\/fonts\/inter_500_efef4d9d61ac26570557ad601dea222a",
+        "600": "C:\\Users\\MyPC One Pro L\\Documents\\website\\grafik\\bpmpntb-vue\\vendor\\dompdf\\dompdf\/lib\/fonts\/inter_600_3604d9d49b61fc3b7c29c4259c86ff89",
+        "bold": "C:\\Users\\MyPC One Pro L\\Documents\\website\\grafik\\bpmpntb-vue\\vendor\\dompdf\\dompdf\/lib\/fonts\/inter_bold_02384cdf43e3d24b76c57c66dfd114bf",
+        "800": "C:\\Users\\MyPC One Pro L\\Documents\\website\\grafik\\bpmpntb-vue\\vendor\\dompdf\\dompdf\/lib\/fonts\/inter_800_43e268268a3801a5ec2cf116ab01b114",
+        "900": "inter_900_5e896423ef3d43fa02b13f3a20da7b92"
+    },
+    "font awesome 6 brands": {
+        "normal": "font_awesome_6_brands_normal_5aa91754f1b8ab9921ec65040d0398d7"
+    },
+    "font awesome 6 free": {
+        "normal": "C:\\Users\\MyPC One Pro L\\Documents\\website\\grafik\\bpmpntb-vue\\vendor\\dompdf\\dompdf\/lib\/fonts\/font_awesome_6_free_normal_8f1c1da98dac9c284cefb97b004bd96e",
+        "900": "font_awesome_6_free_900_85a3b14fbfc79f50bc9c42a8003db748"
+    },
+    "font awesome 5 brands": {
+        "normal": "font_awesome_5_brands_normal_5aa91754f1b8ab9921ec65040d0398d7"
+    },
+    "font awesome 5 free": {
+        "900": "C:\\Users\\MyPC One Pro L\\Documents\\website\\grafik\\bpmpntb-vue\\vendor\\dompdf\\dompdf\/lib\/fonts\/font_awesome_5_free_900_85a3b14fbfc79f50bc9c42a8003db748",
+        "normal": "font_awesome_5_free_normal_8f1c1da98dac9c284cefb97b004bd96e"
+    },
+    "fontawesome": {
+        "normal": "fontawesome_normal_7a14673ce35632e39e645a3d6f1a41c1"
+    }
+}
