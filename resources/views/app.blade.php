@@ -8,10 +8,10 @@
     <title>{{ config('app.name', 'BPMP NTB') }}</title>
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#1e40af">
-    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="BPMP NTB">
-    <link rel="apple-touch-icon" href="/pwa/icon-192.png">
+    <link rel="apple-touch-icon" href="/pwa/icon-192.svg">
     <link rel="stylesheet" href="/fonts/quicksand/quicksand.css">
     <link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css">
     <script src="/vendor/chartjs/chart.umd.js"></script>

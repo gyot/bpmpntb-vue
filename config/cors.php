@@ -6,7 +6,7 @@ return [
 
     'allowed_methods' => ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
 
-    'allowed_origins' => [env('APP_URL', 'http://localhost:8000')],
+    'allowed_origins' => explode(',', env('CORS_ALLOWED_ORIGINS', env('APP_URL'))),
 
     'allowed_origins_patterns' => [],
 

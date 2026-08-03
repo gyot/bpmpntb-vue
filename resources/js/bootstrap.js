@@ -6,7 +6,7 @@ const api = axios.create({
         'Accept': 'application/json',
         'X-Requested-With': 'XMLHttpRequest',
     },
-    withCredentials: true,
+
     transformResponse: [function (data) {
         if (typeof data === 'string') {
             data = data.replace(/^\uFEFF/, '').trim();
@@ -21,7 +21,7 @@ let csrfInitialized = false;
 async function ensureCsrf() {
     if (!csrfInitialized) {
         try {
-            await axios.get('/sanctum/csrf-cookie', { withCredentials: true });
+            await axios.get('/sanctum/csrf-cookie', {  });
             csrfInitialized = true;
         } catch (e) {
             console.error('CSRF cookie failed:', e);
@@ -53,7 +53,15 @@ api.interceptors.response.use(
         }
         if (error.response?.status === 403) {
             if (typeof window !== 'undefined') {
-                import('@/swal.js').then(m => m.swalError('Anda tidak memiliki akses untuk melakukan aksi ini'));
+                const msg = error.response?.data?.message || 'Anda tidak memiliki akses untuk melakukan aksi ini';
+                console.error('[403] status:', error.response?.status);
+                console.error('[403] statusText:', error.response?.statusText);
+                console.error('[403] headers:', JSON.stringify(error.response?.headers));
+                console.error('[403] message:', msg);
+                console.error('[403] data:', error.response?.data);
+                console.error('[403] config url:', error.config?.url);
+                console.error('[403] config method:', error.config?.method);
+                import('@/swal.js').then(m => m.swalError(msg));
             }
         }
         return Promise.reject(error);

@@ -1,12 +1,12 @@
 ﻿<template>
     <div class="admin-layout">
-        <button class="sidebar-toggle" @click="sidebarOpen=!sidebarOpen">
-            <i class="fas fa-bars"></i>
-        </button>
-
         <aside class="sidebar" :class="{'show': sidebarOpen}">
             <div class="sidebar-logo">
-                <h3><i class="fas fa-cog"></i> Admin Panel</h3>
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="user-name">{{ user?.name || 'Admin' }}</div>
+                <div class="user-role" :class="'role-' + (user?.role || 'user')">{{ user?.role || 'user' }}</div>
             </div>
             <div class="sidebar-scroll">
                 <ul class="sidebar-menu">
@@ -40,7 +40,13 @@
             </div>
         </aside>
 
-        <div class="main-content" :class="{'sidebar-open': sidebarOpen}">
+        <div v-if="sidebarOpen" class="sidebar-overlay" @click="sidebarOpen=false"></div>
+
+        <button class="sidebar-toggle" @click="sidebarOpen=!sidebarOpen">
+            <i class="fas fa-bars"></i>
+        </button>
+
+        <div class="main-content">
             <main class="content-body">
                 <router-view />
             </main>
@@ -170,36 +176,53 @@ async function logout() {
     position: fixed;
     top: 0;
     left: 0;
-    z-index: 1000;
+    z-index: 1050;
     transition: left 0.3s;
     display: flex;
     flex-direction: column;
 }
-@media (max-width: 991.98px) {
-    .sidebar { left: -250px; }
-    .sidebar.show { left: 0; }
-    .main-content { margin-left: 0; padding-top: 60px; }
-    .sidebar-toggle { display: block; }
-}
 
 .sidebar-logo {
     text-align: center;
-    padding: 20px 0;
+    padding: 24px 16px 20px;
     color: #fff;
     flex-shrink: 0;
 }
-.sidebar-logo h3 {
-    font-size: 1.1rem;
+.user-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.12);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+    font-size: 1.15rem;
+    color: #fff;
+}
+.user-name {
+    font-size: 0.9rem;
     font-weight: 700;
-    margin: 0;
+    line-height: 1.3;
+    word-break: break-word;
+    margin-bottom: 4px;
 }
-.sidebar-logo i {
-    margin-right: 6px;
+.user-role {
+    display: inline-block;
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    padding: 2px 10px;
+    border-radius: 999px;
 }
+.role-admin { background: rgba(59,130,246,.2); color: #93c5fd; }
+.role-superadmin { background: rgba(168,85,247,.2); color: #d8b4fe; }
+.role-user { background: rgba(255,255,255,.1); color: #9ca3af; }
 
 .sidebar-scroll {
     flex: 1;
-    max-height: calc(100vh - 70px);
+    max-height: calc(100vh - 120px);
     overflow-y: auto;
     overflow-x: hidden;
     padding: 0 0 16px;
@@ -276,32 +299,32 @@ async function logout() {
     margin: 10px 16px;
 }
 
+/* ── OVERLAY ── */
+.sidebar-overlay {
+    display: none;
+}
+
 /* ── TOGGLE ── */
 .sidebar-toggle {
     display: none;
     position: fixed;
-    top: 16px;
-    left: 16px;
+    top: 12px;
+    left: 12px;
     z-index: 1100;
     background: #1c1c1c;
     color: #fff;
     border: none;
-    border-radius: 6px;
-    padding: 8px 12px;
-    font-size: 1.1rem;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 1rem;
     cursor: pointer;
-    transition: left 0.3s;
-}
-.sidebar.show ~ .sidebar-toggle,
-.sidebar.show ~ .main-content .sidebar-toggle {
-    left: 266px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.2);
 }
 
 /* ── MAIN ── */
 .main-content {
     margin-left: 250px;
-    padding: 20px;
-    transition: margin-left 0.3s;
+    padding: 24px;
     min-height: 100vh;
 }
 
@@ -310,9 +333,47 @@ async function logout() {
     margin: 0 auto;
 }
 
-@media (max-width: 575.98px) {
-    .main-content h2 {
-        margin-left: 45px;
+/* ── MOBILE ── */
+@media (max-width: 991.98px) {
+    .sidebar {
+        left: -260px;
+        transition: left 0.3s ease;
     }
+    .sidebar.show {
+        left: 0;
+    }
+    .sidebar-overlay {
+        display: block;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,.45);
+        z-index: 1040;
+        animation: fadeIn .2s ease;
+    }
+    .sidebar-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .main-content {
+        margin-left: 0;
+        padding: 16px;
+        padding-top: 60px;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .main-content {
+        padding: 12px;
+        padding-top: 56px;
+    }
+    .content-body {
+        max-width: 100%;
+    }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 </style>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Settings;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
@@ -17,9 +18,17 @@ class SettingController extends Controller
 
     public function update(Request $request)
     {
+        Log::info('SettingController@update called', [
+            'user' => $request->user()?->email,
+            'role' => $request->user()?->role,
+            'method' => $request->method(),
+            'content_type' => $request->header('Content-Type'),
+            'has_files' => $request->hasFile('logo') || $request->hasFile('favicon'),
+            'is_json' => $request->isJson(),
+        ]);
         $setting = Settings::firstOrFail();
 
-        $validated = $request->validate([
+        $rules = [
             'title' => 'nullable|string|max:255',
             'description' => 'nullable|string|max:1000',
             'footer' => 'nullable|string|max:1000',
@@ -49,7 +58,16 @@ class SettingController extends Controller
             'ikm_score' => 'nullable|numeric|min:0|max:100',
             'ikm_period' => 'nullable|string|max:100',
             'ikm_link' => 'nullable|url|max:500',
-        ]);
+        ];
+
+        $validated = $request->validate($rules);
+
+        $updateData = [];
+        foreach ($validated as $key => $value) {
+            if ($request->has($key) || $request->hasFile($key)) {
+                $updateData[$key] = $value;
+            }
+        }
 
         $colorFields = [
             'primary_color', 'secondary_color', 'accent_color',
@@ -60,8 +78,8 @@ class SettingController extends Controller
         ];
 
         foreach ($colorFields as $field) {
-            if (isset($validated[$field])) {
-                $validated[$field] = $this->sanitizeColor($validated[$field]);
+            if (isset($updateData[$field])) {
+                $updateData[$field] = $this->sanitizeColor($updateData[$field]);
             }
         }
 
@@ -76,7 +94,7 @@ class SettingController extends Controller
                 $old = $uploadDir . '/' . $setting->logo;
                 if (file_exists($old)) unlink($old);
             }
-            $validated['logo'] = $logoName;
+            $updateData['logo'] = $logoName;
         }
 
         if ($request->hasFile('favicon')) {
@@ -87,10 +105,12 @@ class SettingController extends Controller
                 $old = $uploadDir . '/' . $setting->favicon;
                 if (file_exists($old)) unlink($old);
             }
-            $validated['favicon'] = $faviconName;
+            $updateData['favicon'] = $faviconName;
         }
 
-        $setting->update($validated);
+        if (!empty($updateData)) {
+            $setting->update($updateData);
+        }
         Cache::forget('global_settings');
         Cache::forget('global_theme');
 

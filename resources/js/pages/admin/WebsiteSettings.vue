@@ -118,13 +118,21 @@ onMounted(async()=>{
 async function save(){
     success.value='';error.value='';saving.value=true;
     try{
-        const fd=new FormData();
-        Object.entries(form).forEach(([k,v])=>{if(v!==null&&v!=='')fd.append(k,v);});
-        fd.append('_method','POST');
-        await api.post('/settings-admin',fd,{headers:{'Content-Type':'multipart/form-data'}});
-        try{const nfd=new FormData();nfd.append('navigations',JSON.stringify(navItems.value.map(({_id,...rest})=>rest)));await api.post('/ppid/profile',nfd,{headers:{'Content-Type':'multipart/form-data'}});}catch(e){console.error(e);}
+        const payload={};
+        Object.entries(form).forEach(([k,v])=>{if(v!==null&&v!==''&&k!=='logo'&&k!=='favicon')payload[k]=v;});
+        await api.post('/settings-admin',payload);
+        if(form.logo instanceof File||form.favicon instanceof File){
+            const fd=new FormData();
+            if(form.logo instanceof File)fd.append('logo',form.logo);
+            if(form.favicon instanceof File)fd.append('favicon',form.favicon);
+            fd.append('_method','PUT');
+            await api.post('/settings-admin',fd,{headers:{'Content-Type':'multipart/form-data'}});
+        }
+        await api.post('/ppid/profile',{navigations:JSON.stringify(navItems.value.map(({_id,...rest})=>rest))});
         swalSuccess('Pengaturan berhasil disimpan!');
-    }catch(e){swalError(e.response?.data?.message||'Gagal menyimpan');}
+    }catch(e){
+        swalError(e.response?.data?.message||'Gagal menyimpan');
+    }
     saving.value=false;
 }
 </script>

@@ -108,7 +108,7 @@
         </div>
 
         <teleport to="body">
-            <div v-if="modalOpen" class="fixed inset-0 z-50 overflow-hidden">
+            <div v-if="modalOpen" class="fixed inset-0 z-[1060] overflow-hidden">
                 <div class="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" @click="closeModal"></div>
                 <div class="absolute inset-4 md:inset-y-6 md:inset-x-12 lg:inset-y-8 lg:inset-x-24 bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden">
                     <div class="flex items-center justify-between px-6 py-4 border-b bg-gray-50 rounded-t-2xl flex-shrink-0">

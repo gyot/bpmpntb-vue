@@ -17,6 +17,18 @@ Route::get('/layanans/{id}', [LayananController::class, 'show']);
 // PPID Public
 Route::get('/ppid', [PpidController::class, 'publicIndex']);
 
+Route::post('/debug/test-post', function (\Illuminate\Http\Request $request) {
+    return response()->json([
+        'success' => true,
+        'method' => $request->method(),
+        'user' => $request->user()?->email ?? 'guest',
+        'role' => $request->user()?->role ?? 'none',
+        'has_token' => $request->bearerToken() ? 'yes' : 'no',
+        'content_type' => $request->header('Content-Type'),
+        'server' => $request->server('SERVER_SOFTWARE', 'unknown'),
+    ]);
+})->middleware('auth:sanctum');
+
 Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 

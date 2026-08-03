@@ -27,7 +27,7 @@ class PpidController extends Controller
     public function profileIndex() { return response()->json(PpidProfile::first() ?? new PpidProfile()); }
     public function profileUpdate(Request $request)
     {
-        $v = $request->validate([
+        $rules = [
             "title" => "nullable|string|max:255",
             "about" => "nullable|string",
             "visi" => "nullable|string",
@@ -44,8 +44,17 @@ class PpidController extends Controller
             "permohonan_email" => "nullable|string|max:255",
             "permohonan_phone" => "nullable|string|max:50",
             "struktur_image" => "nullable|image|mimes:jpg,jpeg,png|max:5120",
-        ]);
+        ];
+        $validated = $request->validate($rules);
         $profile = PpidProfile::first() ?? new PpidProfile();
+
+        $updateData = [];
+        foreach ($validated as $key => $value) {
+            if ($request->has($key) || $request->hasFile($key)) {
+                $updateData[$key] = $value;
+            }
+        }
+
         if ($request->hasFile("struktur_image")) {
             $ext = strtolower($request->file("struktur_image")->getClientOriginalExtension());
             $filename = Str::random(20) . "." . $ext;
@@ -55,7 +64,7 @@ class PpidController extends Controller
             if ($profile->struktur_image && file_exists(public_path("upload/ppid/".$profile->struktur_image))) {
                 unlink(public_path("upload/ppid/".$profile->struktur_image));
             }
-            $v["struktur_image"] = $filename;
+            $updateData["struktur_image"] = $filename;
         }
         if ($request->hasFile("beranda_image")) {
             $ext = strtolower($request->file("beranda_image")->getClientOriginalExtension());
@@ -66,10 +75,13 @@ class PpidController extends Controller
             if ($profile->beranda_image && file_exists(public_path("upload/ppid/".$profile->beranda_image))) {
                 unlink(public_path("upload/ppid/".$profile->beranda_image));
             }
-            $v["beranda_image"] = $filename;
+            $updateData["beranda_image"] = $filename;
         }
-        $profile->fill($v);
-        $profile->save();
+
+        if (!empty($updateData)) {
+            $profile->fill($updateData);
+            $profile->save();
+        }
         return response()->json($profile);
     }
 

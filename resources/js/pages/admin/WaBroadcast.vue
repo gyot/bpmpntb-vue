@@ -738,7 +738,8 @@ onMounted(() => { loadHistory(); });
     background: linear-gradient(90deg, var(--color-primary), #22c55e);
 }
 .modal-overlay {
-    @apply fixed inset-0 z-50 flex items-center justify-center;
+    @apply fixed inset-0 flex items-center justify-center;
+    z-index: 1060;
     background: rgba(0,0,0,0.4);
     backdrop-filter: blur(2px);
 }
