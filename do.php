@@ -2,24 +2,20 @@
 /**
  * API Proxy - bypasses server-level WAF/mod_security
  * 
- * All /api/* requests are rewritten to this file by .htaccess
- * This file bootstraps Laravel and handles the request internally
+ * Frontend sends requests to /do.php/api/* instead of /api/*
+ * This file strips /do.php prefix and bootstraps Laravel
  */
 
 define('LARAVEL_START', microtime(true));
 define('HOSTING_MODE', true);
 
-// Preserve original request URI for Laravel routing
-$origUri = $_SERVER['REQUEST_URI'] ?? '';
-if (str_starts_with($origUri, '/do.php') || $origUri === '/do.php') {
-    // Request was rewritten, check for original path in redirect
-    $target = $_SERVER['REDIRECT_URL'] ?? $_SERVER['ORIG_REQUEST_URI'] ?? '';
-    if ($target) {
-        $_SERVER['REQUEST_URI'] = $target;
-    }
+// Strip /do.php prefix from REQUEST_URI so Laravel routes correctly
+// e.g. /do.php/api/posts → /api/posts
+$uri = $_SERVER['REQUEST_URI'] ?? '';
+if (preg_match('#^/do\.php(/.*)?$#', $uri, $m)) {
+    $_SERVER['REQUEST_URI'] = $m[1] ?? '/';
 }
 
-// Load Laravel
 require __DIR__.'/engine/vendor/autoload.php';
 $app = require_once __DIR__.'/engine/bootstrap/app.php';
 

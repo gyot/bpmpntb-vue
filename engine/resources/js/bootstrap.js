@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: '/api',
+    baseURL: '/do.php/api',
     headers: {
         'Accept': 'application/json',
         'X-Requested-With': 'XMLHttpRequest',
