@@ -27,7 +27,7 @@ $app = new Illuminate\Foundation\Application(
 */
 
 if (defined('HOSTING_MODE') && HOSTING_MODE) {
-    $app->usePublicPath(dirname(__DIR__));
+    $app->usePublicPath(dirname(dirname(__DIR__)));
 }
 
 /*
