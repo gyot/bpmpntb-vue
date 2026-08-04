@@ -1,8 +1,7 @@
 /.phpunit.cache
-/node_modules
+/engine/node_modules
 
-
-/storage/*.key
+# Environment
 .env
 .env.backup
 .env.production
@@ -16,28 +15,30 @@ yarn-error.log
 /.idea
 /.vscode
 
-# Local files
-*.pdf
-*.png
-*.jpg
-!public/**/*.png
-!public/**/*.jpg
-!public/**/*.svg
-
 # Storage
-/storage/logs/*.log
-/storage/app/public/*
-!/storage/app/public/.gitkeep
+/engine/storage/*.key
+/engine/storage/logs/*.log
+/engine/storage/app/public/*
+!/engine/storage/app/public/.gitkeep
 
-# Public uploads
-/public/upload/*
-!/public/upload/.gitkeep
+# Uploads
+/upload/*
+!/upload/.gitkeep
 
 # Bootstrap cache
-/bootstrap/cache/*.php
-!/bootstrap/cache/.gitkeep
+/engine/bootstrap/cache/*.php
+!/engine/bootstrap/cache/.gitkeep
+
+# Public uploads (legacy path)
+/engine/public/upload/*
+!/engine/public/upload/.gitkeep
 
 # Misc
 *.pdf
 *.zip
 *.tar.gz
+*.map
+
+# OS files
+Thumbs.db
+.DS_Store

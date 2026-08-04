@@ -6,6 +6,8 @@ export default defineConfig({
     plugins: [
         laravel({
             input: 'resources/js/app.js',
+            publicDirectory: '..',
+            buildDirectory: 'build',
             refresh: true,
         }),
         vue({

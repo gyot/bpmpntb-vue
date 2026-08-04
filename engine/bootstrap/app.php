@@ -17,12 +17,12 @@ $app = new Illuminate\Foundation\Application(
 
 /*
 |--------------------------------------------------------------------------
-| Set Public Path For Hosting Mode
+| Set Public Path For engine/ Structure
 |--------------------------------------------------------------------------
 |
-| When deployed with the hosting structure (engine/ folder), the public
-| directory is the parent of the engine folder. We detect this via the
-| HOSTING_MODE constant defined in index_hosting.php.
+| The Laravel app lives inside engine/ while the public directory
+| (index.php, build/, upload/) is the parent directory.
+| HOSTING_MODE is defined in the root index.php.
 |
 */
 
