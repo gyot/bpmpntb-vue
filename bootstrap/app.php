@@ -17,6 +17,21 @@ $app = new Illuminate\Foundation\Application(
 
 /*
 |--------------------------------------------------------------------------
+| Set Public Path For Hosting Mode
+|--------------------------------------------------------------------------
+|
+| When deployed with the hosting structure (engine/ folder), the public
+| directory is the parent of the engine folder. We detect this via the
+| HOSTING_MODE constant defined in index_hosting.php.
+|
+*/
+
+if (defined('HOSTING_MODE') && HOSTING_MODE) {
+    $app->usePublicPath(dirname(__DIR__));
+}
+
+/*
+|--------------------------------------------------------------------------
 | Bind Important Interfaces
 |--------------------------------------------------------------------------
 |
