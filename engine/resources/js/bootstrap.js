@@ -38,6 +38,23 @@ api.interceptors.request.use((config) => {
     if (csrfToken) {
         config.headers['X-CSRF-TOKEN'] = csrfToken;
     }
+
+    // Convert PUT/DELETE/PATCH to POST with _method spoofing
+    // This bypasses hosting firewalls that block non-POST methods
+    const method = (config.method || '').toLowerCase();
+    if (method === 'put' || method === 'delete' || method === 'patch') {
+        const upperMethod = method.toUpperCase();
+        config.method = 'post';
+
+        if (config.data instanceof FormData) {
+            config.data.append('_method', upperMethod);
+        } else if (typeof config.data === 'object' && config.data !== null) {
+            config.data._method = upperMethod;
+        } else {
+            config.params = { ...config.params, _method: upperMethod };
+        }
+    }
+
     return config;
 });
 
