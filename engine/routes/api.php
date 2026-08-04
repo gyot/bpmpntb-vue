@@ -39,7 +39,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/kategori/{jenis}', [PostController::class, 'kategoriIndex']);
 });
 
-Route::middleware(['auth:sanctum', 'admin'])->group(function () {
+Route::middleware('auth:sanctum')->group(function () {
     Route::get('/dashboard-stats', [PostController::class, 'dashboardStats']);
     Route::apiResource('sliders', SliderController::class)->except(['show']);
     Route::post('/sliders/reorder', [SliderController::class, 'reorder']);

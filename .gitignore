@@ -30,8 +30,7 @@ yarn-error.log
 !/engine/bootstrap/cache/.gitkeep
 
 # Public uploads (legacy path)
-/engine/public/upload/*
-!/engine/public/upload/.gitkeep
+/engine/public
 
 # Misc
 *.pdf
