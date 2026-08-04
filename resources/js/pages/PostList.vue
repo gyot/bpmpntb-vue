@@ -28,7 +28,7 @@
                     <i class="fas fa-inbox text-5xl text-gray-200 mb-4"></i>
                     <p style="color:var(--color-text-secondary)">Belum ada data.</p>
                 </div>
-
+<!-- /// -->
                 <div v-if="lastPage>1" class="flex justify-center items-center gap-1.5 mt-10">
                     <button @click="loadPage(1)" :disabled="currentPage<=1"
                         class="w-9 h-9 rounded-lg flex items-center justify-center text-xs transition-all disabled:opacity-30 disabled:cursor-not-allowed"
