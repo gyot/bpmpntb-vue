@@ -301,14 +301,31 @@ class PostController extends Controller
 
     public function uploadImage(Request $request)
     {
+        $uploadedUrls = [];
+        $uploadDir = public_path('upload/editor');
+        if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
+
+        // Base64 JSON mode (bypasses hosting WAF)
+        if ($request->has('images') && is_array($request->input('images'))) {
+            foreach ($request->input('images') as $base64) {
+                if (!preg_match('/^data:image\/(\w+);base64,/', $base64, $type)) continue;
+                $data = substr($base64, strpos($base64, ',') + 1);
+                $data = base64_decode($data);
+                if (!$data) continue;
+                $ext = strtolower($type[1]);
+                if (!in_array($ext, ['jpeg','jpg','png','gif','webp'])) continue;
+                $filename = time() . '_' . mt_rand(1000, 9999) . '.' . $ext;
+                file_put_contents($uploadDir . '/' . $filename, $data);
+                $uploadedUrls[] = asset('upload/editor/' . $filename);
+            }
+            return response()->json(['success' => true, 'urls' => $uploadedUrls]);
+        }
+
+        // Traditional file upload mode (fallback)
         $request->validate([
             'image' => 'required|array',
             'image.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:20024',
         ]);
-
-        $uploadedUrls = [];
-        $uploadDir = public_path('upload/editor');
-        if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
 
         foreach ($request->file('image') as $file) {
             $ext = strtolower($file->getClientOriginalExtension());

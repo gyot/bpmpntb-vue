@@ -276,10 +276,9 @@ async function loadPost() {
 }
 
 async function uploadQuillImage(file) {
-    const fd = new FormData();
-    fd.append('image[]', file);
     try {
-        const { data } = await api.post('/quil-upload-image', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
+        const base64 = await new Promise((resolve, reject) => { const r = new FileReader(); r.onload = () => resolve(r.result); r.onerror = reject; r.readAsDataURL(file); });
+        const { data } = await api.post('/quil-upload-image', { images: [base64] });
         if (data.success && data.urls?.length) return data.urls[0];
     } catch(e) { console.error('Upload failed', e); }
     return null;

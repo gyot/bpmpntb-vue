@@ -138,8 +138,11 @@ function clearImage(){form.image=null;if(imagePreview.value)URL.revokeObjectURL(
 function handlePosDrop(e){const f=e.dataTransfer.files[0];if(f&&f.type==='application/pdf')form.pos_file=f;}
 
 async function uploadEditorImage(file){
-    const fd=new FormData();fd.append('image[]',file);
-    try{const{data}=await api.post('/quil-upload-image',fd,{headers:{'Content-Type':'multipart/form-data'}});if(data.success&&data.urls?.length)return data.urls[0];}catch(e){console.error(e);}
+    try{
+        const base64=await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(file);});
+        const{data}=await api.post('/quil-upload-image',{images:[base64]});
+        if(data.success&&data.urls?.length)return data.urls[0];
+    }catch(e){console.error(e);}
     return null;
 }
 

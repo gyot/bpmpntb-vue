@@ -378,8 +378,11 @@ function clearThumb(){mform.thumbnail=null;if(thumbPreview.value)URL.revokeObjec
 function clearFile(){mform.file=null;filePreview.value=null;if(modalFileInput.value)modalFileInput.value.value='';}
 
 async function uploadQuillImage(file){
-    const fd=new FormData();fd.append('image[]',file);
-    try{const{data}=await api.post('/quil-upload-image',fd,{headers:{'Content-Type':'multipart/form-data'}});if(data.success&&data.urls?.length)return data.urls[0];}catch(e){console.error(e);}
+    try{
+        const base64=await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(file);});
+        const{data}=await api.post('/quil-upload-image',{images:[base64]});
+        if(data.success&&data.urls?.length)return data.urls[0];
+    }catch(e){console.error(e);}
     return null;
 }
 
