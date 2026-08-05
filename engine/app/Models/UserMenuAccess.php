@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class UserMenuAccess extends Model
 {
     protected $table = 'user_menu_access';
-    protected $fillable = ['user_id', 'menu_key'];
+    protected $fillable = ['user_id', 'menu_key', 'sub_menu_key'];
 
     public function user()
     {

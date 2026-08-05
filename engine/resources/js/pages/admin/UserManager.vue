@@ -63,15 +63,33 @@
                 <button @click="showMenuModal=false" class="um-modal-close">&times;</button>
             </div>
             <div class="um-modal-body">
-                <p class="text-xs mb-4" style="color:#64748b;">Centang menu yang boleh diakses oleh user ini. Admin memiliki akses ke semua menu secara default.</p>
+                <p class="text-xs mb-4" style="color:#64748b;">Centang menu yang boleh diakses. Klik panah untuk mengatur akses sub menu secara spesifik.</p>
                 <div class="space-y-2">
-                    <label v-for="(label, key) in allMenus" :key="key" class="um-menu-item">
-                        <input type="checkbox" :value="key" v-model="selectedMenus" class="um-checkbox">
-                        <div>
-                            <div class="fw-semibold text-sm" style="color:#0f172a;">{{ label }}</div>
-                            <div class="text-xs" style="color:#94a3b8;">{{ menuDescriptions[key] }}</div>
+                    <div v-for="(label, key) in allMenus" :key="key" class="um-menu-group">
+                        <label class="um-menu-item" :class="{'um-menu-expanded': expandedMenus.has(key)}">
+                            <input type="checkbox" :checked="selectedMenus.includes(key)" @change="toggleMenu(key)" class="um-checkbox">
+                            <div class="um-menu-info" @click.self="toggleMenu(key)">
+                                <div>
+                                    <div class="fw-semibold text-sm" style="color:#0f172a;">{{ label }}</div>
+                                    <div class="text-xs" style="color:#94a3b8;">{{ menuDescriptions[key] }}</div>
+                                </div>
+                            </div>
+                            <button v-if="allSubMenus[key] && Object.keys(allSubMenus[key]).length" @click="toggleExpand(key)" class="um-expand-btn" :class="{'um-expand-open': expandedMenus.has(key)}" type="button">
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                        </label>
+                        <div v-if="expandedMenus.has(key) && allSubMenus[key]" class="um-submenu-list">
+                            <label v-for="(subLabel, subKey) in allSubMenus[key]" :key="subKey" class="um-submenu-item">
+                                <input type="checkbox" :value="subKey" :checked="isSubChecked(key, subKey)" @change="toggleSubMenu(key, subKey)" class="um-checkbox um-checkbox-sm">
+                                <span class="text-xs" style="color:#334155;">{{ subLabel }}</span>
+                            </label>
+                            <div class="um-submenu-hint">
+                                <i class="fas fa-info-circle mr-1" style="color:#94a3b8;"></i>
+                                <span v-if="isSubMenuSelectionActive(key)">Hanya sub menu terpilih yang dapat diakses</span>
+                                <span v-else>Semua sub menu dapat diakses</span>
+                            </div>
                         </div>
-                    </label>
+                    </div>
                 </div>
             </div>
             <div class="um-modal-footer">
@@ -96,7 +114,10 @@ const form=reactive({name:'',email:'',password:'',password_confirmation:'',role:
 const showMenuModal=ref(false);
 const selectedUser=ref(null);
 const selectedMenus=ref([]);
+const selectedSubMenus=ref({});
 const allMenus=ref({});
+const allSubMenus=ref({});
+const expandedMenus=ref(new Set());
 
 const menuDescriptions={
     dashboard:'Halaman dashboard dan statistik',
@@ -104,6 +125,7 @@ const menuDescriptions={
     kategori:'Kelola kategori konten',
     media:'Kelola Sliders, Layanan, Link Eksternal',
     chatbot:'Si Intan: Dashboard, Intent, Live Chat, Analytics, KB, AI Config',
+    broadcast:'Kelola WhatsApp Broadcast',
     ppid:'Kelola PPID',
     pengaturan:'Pengaturan Website, Tema, Users',
 };
@@ -140,21 +162,66 @@ async function destroy(id){
 
 async function openMenuAccess(u){
     selectedUser.value=u;
+    expandedMenus.value=new Set();
     try{
         const[menusRes,accessRes]=await Promise.all([api.get('/users/menus/list'),api.get(`/users/${u.id}/menu-access`)]);
-        allMenus.value=menusRes.data;
+        allMenus.value=menusRes.data.menus||menusRes.data;
+        allSubMenus.value=menusRes.data.subMenus||{};
         selectedMenus.value=accessRes.data.menus||[];
-    }catch(e){allMenus.value={};selectedMenus.value=[];}
+        selectedSubMenus.value=accessRes.data.subMenus||{};
+    }catch(e){allMenus.value={};allSubMenus.value={};selectedMenus.value=[];selectedSubMenus.value={};}
     showMenuModal.value=true;
+}
+
+function toggleMenu(key){
+    const idx=selectedMenus.value.indexOf(key);
+    if(idx>=0){
+        selectedMenus.value.splice(idx,1);
+        delete selectedSubMenus.value[key];
+    }else{
+        selectedMenus.value.push(key);
+    }
+}
+
+function toggleExpand(key){
+    const s=new Set(expandedMenus.value);
+    if(s.has(key))s.delete(key);else s.add(key);
+    expandedMenus.value=s;
+}
+
+function isSubChecked(menuKey,subKey){
+    return selectedSubMenus.value[menuKey]?.includes(subKey)||false;
+}
+
+function isSubMenuSelectionActive(menuKey){
+    return selectedSubMenus.value[menuKey]?.length>0;
+}
+
+function toggleSubMenu(menuKey,subKey){
+    if(!selectedMenus.value.includes(menuKey))selectedMenus.value.push(menuKey);
+    if(!selectedSubMenus.value[menuKey])selectedSubMenus.value[menuKey]=[];
+    const arr=selectedSubMenus.value[menuKey];
+    const idx=arr.indexOf(subKey);
+    if(idx>=0)arr.splice(idx,1);else arr.push(subKey);
 }
 
 function selectAllMenus(){
     selectedMenus.value=Object.keys(allMenus.value);
+    selectedSubMenus.value={};
 }
 
 async function saveMenuAccess(){
     try{
-        await api.put(`/users/${selectedUser.value.id}/menu-access`,{menus:selectedMenus.value});
+        const payload={
+            menus:selectedMenus.value,
+            subMenus:{},
+        };
+        for(const menu of selectedMenus.value){
+            if(selectedSubMenus.value[menu]?.length){
+                payload.subMenus[menu]=selectedSubMenus.value[menu];
+            }
+        }
+        await api.put(`/users/${selectedUser.value.id}/menu-access`,payload);
         swalSuccess('Menu access berhasil diupdate!');
         showMenuModal.value=false;load();
     }catch(e){swalError(e.response?.data?.message||'Gagal');}
@@ -196,5 +263,16 @@ onMounted(load);
 .um-modal-footer{display:flex;justify-content:flex-end;gap:8px;padding:12px 20px;border-top:1px solid #e2e8f0}
 .um-menu-item{display:flex;align-items:flex-start;gap:12px;padding:10px 14px;border:1px solid #e2e8f0;border-radius:10px;cursor:pointer;transition:all .15s}
 .um-menu-item:hover{border-color:#93c5fd;background:#f0f7ff}
+.um-menu-expanded{border-color:#93c5fd;background:#f0f7ff;border-bottom-left-radius:0;border-bottom-right-radius:0}
+.um-menu-group{border-radius:10px}
+.um-menu-info{flex:1;display:flex;align-items:flex-start}
+.um-expand-btn{width:28px;height:28px;border-radius:6px;border:none;background:#f1f5f9;color:#64748b;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:10px;transition:all .2s;flex-shrink:0}
+.um-expand-btn:hover{background:#e2e8f0;color:#334155}
+.um-expand-open{transform:rotate(180deg)}
+.um-submenu-list{border:1px solid #93c5fd;border-top:none;background:#f8fafc;padding:10px 14px 10px 44px;border-bottom-left-radius:10px;border-bottom-right-radius:10px;display:flex;flex-direction:column;gap:6px}
+.um-submenu-item{display:flex;align-items:center;gap:8px;padding:4px 0;cursor:pointer}
+.um-submenu-item:hover span{color:#2563eb}
 .um-checkbox{width:18px;height:18px;accent-color:#2563eb;margin-top:2px;cursor:pointer}
+.um-checkbox-sm{width:15px;height:15px;margin-top:0}
+.um-submenu-hint{font-size:10px;color:#94a3b8;padding:4px 0 0;display:flex;align-items:center}
 </style>

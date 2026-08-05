@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Standar Pelayanan - Pemetaan dan Supervisi Mutu Pendidikan | BPMP NTB</title>
+    <link rel="icon" href="https://bpmpntb.kemendikdasmen.go.id/upload/settings/20220306144845.png" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .hero-pattern {
+            background-color: #f0f4f8;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23003d7a' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+
+    <!-- Header -->
+    <header class="bg-white-900 text-dark relative z-50 sticky top-0">
+        <!-- Main Header -->
+        <div id="mainHeader" class="w-full bg-white py-4 transition-all duration-300 z-40">
+            <div class="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center">
+                <div class="flex items-center mb-4 md:mb-0">
+                    <img src="https://bpmpntb.kemendikdasmen.go.id/upload/settings/1DpdWmI2pA4wuAPW5LnD.png" style="width: 400px;" alt="BPMP NTB Logo">
+                </div>
+                <div class="hidden md:block ml-4 flex-shrink-0"></div>
+                <div class="relative">
+                    <img src="https://bpmpntb.kemendikdasmen.go.id/zi_wbbm.png" width="400" alt="ZI WBBM" class="inline-block align-middle">
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <nav id="mainNav" class="bg-blue-800 w-full z-50 transition-all duration-300">
+            <div class="container mx-auto px-4">
+                <div class="flex flex-col md:flex-row">
+                    <button id="menuToggle"
+                        class="md:hidden flex items-center px-3 py-2 my-2 border rounded text-blue-200 border-blue-400 hover:text-white hover:border-white">
+                        <svg class="fill-current h-4 w-4" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M0 3h20v2H0V3zm0 6h20v2H0V9zm0 6h20v2H0v-2z" />
+                        </svg>
+                        <span class="ml-2">Menu</span>
+                    </button>
+                    <div id="navMenu" class="hidden md:flex flex-col md:flex-row w-full">
+                        <a href="#" class="block px-4 py-3 md:py-4 text-blue-100 hover:bg-blue-700 hover:text-white font-medium">Beranda</a>
+                        <div class="relative group">
+                            <a href="#" class="block px-4 py-3 md:py-4 text-blue-100 hover:bg-blue-700 hover:text-white font-medium cursor-pointer">
+                                Profil <i class="fa fa-caret-down ml-1"></i>
+                            </a>
+                            <div class="absolute left-0 top-full w-48 bg-white rounded shadow-lg z-20 opacity-0 group-hover:opacity-100 group-hover:visible invisible transition duration-200">
+                                <a href="#" class="block px-4 py-2 text-blue-800 hover:bg-blue-100">Visi & Misi</a>
+                                <a href="#" class="block px-4 py-2 text-blue-800 hover:bg-blue-100">Sejarah</a>
+                                <a href="#" class="block px-4 py-2 text-blue-800 hover:bg-blue-100">Struktur Organisasi</a>
+                                <a href="#" class="block px-4 py-2 text-blue-800 hover:bg-blue-100">Tugas Pokok dan Fungsi</a>
+                            </div>
+                        </div>
+                        <div class="relative group">
+                            <a href="#" class="block px-4 py-3 md:py-4 text-blue-100 hover:bg-blue-700 hover:text-white font-medium cursor-pointer">
+                                Layanan <i class="fa fa-caret-down ml-1"></i>
+                            </a>
+                            <div class="absolute left-0 top-full w-72 bg-white rounded shadow-lg z-20 opacity-0 group-hover:opacity-100 group-hover:visible invisible transition duration-200">
+                                <a href="#" class="block px-4 py-2 text-blue-800 hover:bg-blue-100">Data & Informasi Mutu Pendidikan</a>
+                                <a href="#" class="block px-4 py-2 text-blue-800 hover:bg-blue-100">Fasilitasi Penjaminan Mutu</a>
+                                <a href="#" class="block px-4 py-2 text-blue-800 hover:bg-blue-100">Kemitraan Penjaminan Mutu</a>
+                                <a href="#" class="block px-4 py-2 text-blue-800 hover:bg-blue-100 font-semibold bg-blue-50">Pemetaan & Supervisi Mutu</a>
+                                <a href="#" class="block px-4 py-2 text-blue-800 hover:bg-blue-100">Peminjaman Sarana Prasarana</a>
+                                <a href="#" class="block px-4 py-2 text-blue-800 hover:bg-blue-100">Penerimaan Peserta Magang</a>
+                                <a href="#" class="block px-4 py-2 text-blue-800 hover:bg-blue-100">Pengaduan Masyarakat</a>
+                            </div>
+                        </div>
+                        <a href="#" class="block px-4 py-3 md:py-4 text-blue-100 hover:bg-blue-700 hover:text-white font-medium">PPID</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <section class="py-12 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col lg:flex-row gap-8">
+                <!-- Artikel Utama -->
+                <div class="flex-1">
+                    <div class="bg-white shadow-md rounded-2xl p-6 border border-gray-200">
+                        <h1 class="text-3xl font-bold text-emerald-700 mb-2">Standar Pelayanan</h1>
+                        <p class="text-lg text-gray-700 mb-6">Pemetaan dan Supervisi Mutu Pendidikan</p>
+
+                        <div class="mb-6">
+                            <div class="bg-emerald-50 border-l-4 border-emerald-400 text-emerald-700 p-4 mb-4 rounded-md">
+                                <p>
+                                    Standar Pelayanan Pemetaan dan Supervisi Mutu Pendidikan di Balai Penjaminan Mutu Pendidikan (BPMP) Provinsi NTB disusun sebagai acuan dalam pemberian layanan yang berisi mekanisme dan prosedur pelayanan pemetaan dan supervisi mutu pendidikan. Pemberian layanan dilakukan melalui mekanisme penyampaian permohonan kepada Kepala BPMP Provinsi NTB melalui Unit Layanan Terpadu (ULT). Permohonan didisposisikan kepada Kepala Subbagian Umum untuk dikoordinasikan dengan Tim Kerja yang memb- Pemetaan dan Supervisi. Waktu pelayanan disesuaikan dengan kesepakatan dengan pemohon. Pembiayaan ditentukan berdasarkan standar biaya masukan atau sesuai kesepakatan.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Informasi Pelayanan -->
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <h2 class="text-xl font-semibold mb-2 text-gray-800">Persyaratan Pelayanan</h2>
+                                <ul class="list-disc list-inside text-gray-700 space-y-1">
+                                    <li>Permohonan supervisi mutu oleh pihak-pihak berkepentingan.</li>
+                                    <li>Data nama sekolah sesuai alamat yang jelas.</li>
+                                    <li>Permohonan diajukan 1 (satu) tahun sebelumnya.</li>
+                                </ul>
+                            </div>
+
+                            <div>
+                                <h2 class="text-xl font-semibold mb-2 text-gray-800">Jangka Waktu & Biaya</h2>
+                                <p class="text-gray-700">
+                                    Maksimal <span class="font-semibold text-green-700">5 hari kerja</span> sejak permohonan diterima.
+                                </p>
+                                <p class="text-sm mt-2">
+                                    <span class="inline-block px-2 py-1 bg-yellow-100 text-yellow-800 text-sm rounded">Biaya sesuai standar biaya masukan atau sesuai kesepakatan</span>
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Mekanisme -->
+                        <div class="mt-8">
+                            <h2 class="text-xl font-semibold mb-2 text-gray-800">Mekanisme & Prosedur</h2>
+                            <ol class="list-decimal list-inside text-gray-700 space-y-1">
+                                <li>Pemohon mengajukan permohonan melalui ULT BPMP Provinsi NTB.</li>
+                                <li>ULT memeriksa dokumen permohonan.</li>
+                                <li>Permohonan diteruskan ke Persuratan.</li>
+                                <li>Disposisi Kepala BPMP ke Kasubbag Umum.</li>
+                                <li>Kepala Subbagian Umum memproses permohonan berkoordinasi dengan Tim Kerja yang memb- Pemetaan dan Supervisi.</li>
+                                <li>Menyusun jadwal pelaksanaan Pemetaan dan Supervisi Mutu Pendidikan.</li>
+                            </ol>
+                        </div>
+
+                        <!-- Produk -->
+                        <div class="mt-6">
+                            <h2 class="text-xl font-semibold mb-2 text-gray-800">Produk Pelayanan</h2>
+                            <p class="text-gray-700">Laporan Pelaksanaan Pemetaan dan Supervisi Mutu Pendidikan.</p>
+                        </div>
+
+                        <!-- Pengaduan -->
+                        <div class="mt-6">
+                            <h2 class="text-xl font-semibold mb-2 text-gray-800">Kanal Pengaduan & Masukan</h2>
+                            <ul class="list-disc list-inside text-gray-700 space-y-1">
+                                <li>Surat tertulis ditujukan kepada Kepala BPMP Provinsi Nusa Tenggara Barat, Jl. Panji Tilarnegara No. 8, Mataram 83114.</li>
+                                <li>Telepon/WA: <span class="font-medium">08113906669</span></li>
+                                <li>Media Sosial: Instagram, TikTok, Facebook @BPMPNTB</li>
+                                <li>Website: <a href="https://bpmpntb.kemendikdasmen.go.id" class="text-blue-600 hover:underline">bpmpntb.kemendikdasmen.go.id</a></li>
+                            </ul>
+                        </div>
+
+                        <!-- Dasar Hukum -->
+                        <div class="mt-6">
+                            <h2 class="text-xl font-semibold mb-2 text-gray-800">Dasar Hukum</h2>
+                            <ul class="list-disc list-inside text-gray-700 space-y-1">
+                                <li>UU No. 20 Tahun 2003 tentang Sistem Pendidikan Nasional.</li>
+                                <li>UU No. 23 Tahun 2014 tentang Pemerintahan Daerah.</li>
+                                <li>PP No. 17 Tahun 2010 tentang Pengelolaan dan Penyelenggaraan Pendidikan.</li>
+                                <li>PP No. 19 Tahun 2005 tentang Standar Nasional Pendidikan sebagaimana diubah dengan PP No. 13 Tahun 2015.</li>
+                                <li>Permendikbud No. 28 Tahun 2016 tentang Sistem Penjaminan Mutu Pendidikan Dasar dan Menengah.</li>
+                                <li>Permendikbudristek No. 28 Tahun 2021 tentang Organisasi dan Tata Kerja Kementerian Pendidikan, Kebudayaan, Riset, dan Teknologi.</li>
+                                <li>Permendikbudristek No. 11 Tahun 2022 tentang Organisasi Dan Tata Kerja Balai Besar Penjaminan Mutu Pendidikan Dan Balai Penjaminan Mutu Pendidikan.</li>
+                            </ul>
+                        </div>
+
+                        <!-- Fasilitas & Kompetensi -->
+                        <div class="mt-6">
+                            <h2 class="text-xl font-semibold mb-2 text-gray-800">Fasilitas & Kompetensi Pelaksana</h2>
+                            <p class="text-gray-700 mb-2">
+                                Sarana dan prasarana yang tersedia: Aplikasi, Komputer, Printer, dan ATK.
+                            </p>
+                            <p class="text-gray-700">
+                                Pelaksana berpendidikan minimal S1, memiliki pengalaman supervise terkait mutu pendidikan, serta memiliki kemampuan mengolah data mutu pendidikan.
+                            </p>
+                        </div>
+
+                        <!-- Evaluasi -->
+                        <div class="mt-6">
+                            <h2 class="text-xl font-semibold mb-2 text-gray-800">Evaluasi, Pengawasan & Jaminan</h2>
+                            <p class="text-gray-700 mb-2">
+                                Pengawasan dilakukan oleh atasan langsung berdasarkan disposisi penugasan. Pelaksana diseleksi berdasarkan kriteria kompetensi dari tim layanan.
+                            </p>
+                            <p class="text-gray-700 mb-2">
+                                Evaluasi kinerja dilakukan melalui umpan balik pelanggan dan pihak terkait, serta evaluasi di setiap tahapan sesuai mekanisme.
+                            </p>
+                            <p class="text-gray-700">
+                                Surat tugas diberikan langsung oleh Kepala BPMP NTB sebagai jaminan pelayanan.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sidebar Kanan -->
+                <aside class="w-full lg:w-80 flex-shrink-0">
+                    <div class="grid grid-cols-3 gap-8 mb-8 text-center">
+                        <a href="#">
+                            <img src="https://img.icons8.com/fluency/70/document.png" alt="Laporan Kinerja" class="mx-auto mb-2" style="height:70px">
+                            <div class="text-blue-900 font-medium mt-2">Laporan Kinerja</div>
+                        </a>
+                        <a href="#">
+                            <img src="https://img.icons8.com/fluency/70/planner.png" alt="Rencana Strategis" class="mx-auto mb-2" style="height:70px">
+                            <div class="text-blue-900 font-medium mt-2">Rencana Strategis</div>
+                        </a>
+                        <a href="#">
+                            <img src="https://img.icons8.com/fluency/70/handshake.png" alt="Perjanjian Kinerja" class="mx-auto mb-2" style="height:70px">
+                            <div class="text-blue-900 font-medium mt-2">Perjanjian Kinerja</div>
+                        </a>
+                    </div>
+
+                    <div class="bg-white rounded-lg p-6 shadow mb-8">
+                        <h3 class="text-lg font-bold text-blue-900 mb-4">Daftar Standar Pelayanan</h3>
+                        <ul class="space-y-2 text-gray-700">
+                            <li><a href="#" class="hover:text-blue-600 hover:underline">1. Data dan Informasi Mutu Pendidikan</a></li>
+                            <li><a href="#" class="hover:text-blue-600 hover:underline font-semibold text-emerald-700">2. Pemetaan dan Supervisi Mutu Pendidikan</a></li>
+                            <li><a href="#" class="hover:text-blue-600 hover:underline">3. Kemitraan Penjaminan Mutu Pendidikan</a></li>
+                            <li><a href="#" class="hover:text-blue-600 hover:underline">4. Fasilitasi Penjaminan Mutu Pendidikan</a></li>
+                            <li><a href="#" class="hover:text-blue-600 hover:underline">5. Peminjaman Sarana dan Prasarana</a></li>
+                            <li><a href="#" class="hover:text-blue-600 hover:underline">6. Pengaduan Masyarakat</a></li>
+                            <li><a href="#" class="hover:text-blue-600 hover:underline">7. Penerimaan Peserta Magang</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-white rounded-lg p-6 shadow mb-8">
+                        <h3 class="text-lg font-bold text-blue-900 mb-4">Tautan Eksternal</h3>
+                        <ul class="space-y-2">
+                            <li>
+                                <a href="https://www.kemdikbud.go.id/" target="_blank" class="text-blue-700 hover:underline flex items-center">
+                                    <svg class="h-4 w-4 mr-2 text-blue-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M14 3h7v7m0 0L10 21l-7-7L17 3z"/>
+                                    </svg>
+                                    KEMENDIKDASMEN
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://dapo.kemendikdasmen.go.id/" target="_blank" class="text-blue-700 hover:underline flex items-center">
+                                    <svg class="h-4 w-4 mr-2 text-blue-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M14 3h7v7m0 0L10 21l-7-7L17 3z"/>
+                                    </svg>
+                                    DAPODIK
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://sp4n.lapor.go.id/" target="_blank" class="text-blue-700 hover:underline flex items-center">
+                                    <svg class="h-4 w-4 mr-2 text-blue-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M14 3h7v7m0 0L10 21l-7-7L17 3z"/>
+                                    </svg>
+                                    SP4N-LAPOR
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white pt-12 pb-6">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
+                <!-- Kolom 1: Info Instansi -->
+                <div>
+                    <h3 class="text-xl font-bold mb-4">Balai Penjaminan Mutu Pendidikan Nusa Tenggara Barat (BPMP NTB)</h3>
+                    <p class="text-gray-300 mb-4">Jl. Panji Tilarnegara, No. 08 Mataram - NTB</p>
+                    <div class="flex space-x-4">
+                        <a href="https://facebook.com/bpmpntb" class="text-gray-300 hover:text-white" target="_blank"><i class="fab fa-facebook-f"></i></a>
+                        <a href="https://instagram.com/bpmpntb" class="text-gray-300 hover:text-white" target="_blank"><i class="fab fa-instagram"></i></a>
+                        <a href="https://www.youtube.com/@bpmpntb6747" class="text-gray-300 hover:text-white" target="_blank"><i class="fab fa-youtube"></i></a>
+                        <a href="https://wa.me/628113906669" class="text-gray-300 hover:text-white" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                    </div>
+                </div>
+
+                <!-- Kolom 2: Kontak -->
+                <div>
+                    <h3 class="text-xl font-bold mb-4">Hubungi Kami</h3>
+                    <ul class="space-y-2">
+                        <li class="flex items-start">
+                            <i class="fas fa-phone-alt mr-2 text-gray-400"></i>
+                            <span class="text-gray-300">08113906669</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-envelope mr-2 text-gray-400"></i>
+                            <span class="text-gray-300">ntblpmp@gmail.com</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-map-marker-alt mr-2 text-gray-400"></i>
+                            <span class="text-gray-300">Jl. Panji Tilarnegara, No. 08 Mataram - NTB</span>
+                        </li>
+                    </ul>
+                    <div class="mt-6">
+                        <h4 class="text-lg font-medium mb-2">Jam Layanan</h4>
+                        <p class="text-gray-300">Senin - Jumat: 08.00 - 16.00 WITA</p>
+                    </div>
+                </div>
+
+                <!-- Kolom 3: Tautan -->
+                <div>
+                    <h3 class="text-xl font-bold mb-4">Tautan</h3>
+                    <ul class="space-y-2">
+                        <li><a href="https://www.kemdikbud.go.id/" target="_blank" class="text-gray-300 hover:text-white">Kemendikdasmen</a></li>
+                        <li><a href="https://dapo.kemendikdasmen.go.id/" target="_blank" class="text-gray-300 hover:text-white">Dapodik</a></li>
+                        <li><a href="https://sp4n.lapor.go.id/" target="_blank" class="text-gray-300 hover:text-white">SP4N-LAPOR</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="border-t border-gray-700 pt-6">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <p class="text-gray-400 text-sm mb-4 md:mb-0">&copy; 2025 Balai Penjaminan Mutu Pendidikan Nusa Tenggara Barat (BPMP NTB). All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const menuToggle = document.getElementById('menuToggle');
+        const navMenu = document.getElementById('navMenu');
+        if (menuToggle && navMenu) {
+            menuToggle.addEventListener('click', () => {
+                navMenu.classList.toggle('hidden');
+            });
+        }
+    </script>
+</body>
+
+</html>

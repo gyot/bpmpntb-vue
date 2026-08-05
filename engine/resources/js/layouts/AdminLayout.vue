@@ -64,6 +64,7 @@ const sidebarOpen = ref(false);
 const user = ref(null);
 const setting = ref(null);
 const allowedMenus = ref([]);
+const allowedSubMenus = ref({});
 
 const capitalize = s => s.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 const contentTypes = ['berita', 'artikel', 'buletin', 'jurnal', 'kliping', 'pengumuman', 'galeri', 'unduhan', 'profil', 'renstra', 'lakin', 'perjanjian_kinerja'];
@@ -72,59 +73,59 @@ const allMenuGroups = [
     {
         key: 'konten', label: 'Konten', icon: 'fas fa-newspaper', open: false,
         items: [
-            ...contentTypes.map(j => ({ label: capitalize(j), to: `/admin/konten/${j}` })),
+            ...contentTypes.map(j => ({ label: capitalize(j), to: `/admin/konten/${j}`, subKey: j })),
             { label: 'Export/Import', to: '/admin/export-import/konten', icon: 'fas fa-exchange-alt' }
         ]
     },
     {
         key: 'kategori', label: 'Kategori', icon: 'fas fa-tags', open: false,
         items: [
-            ...contentTypes.map(j => ({ label: capitalize(j), to: `/admin/kategori/${j}` })),
+            ...contentTypes.map(j => ({ label: capitalize(j), to: `/admin/kategori/${j}`, subKey: j })),
             { label: 'Export/Import', to: '/admin/export-import/kategori', icon: 'fas fa-exchange-alt' }
         ]
     },
     {
         key: 'media', label: 'Media', icon: 'fas fa-photo-video', open: false,
         items: [
-            { label: 'Sliders', to: '/admin/sliders' },
-            { label: 'Layanan', to: '/admin/layanans' },
-            { label: 'Link Eksternal', to: '/admin/external-links' },
+            { label: 'Sliders', to: '/admin/sliders', subKey: 'sliders' },
+            { label: 'Layanan', to: '/admin/layanans', subKey: 'layanan' },
+            { label: 'Link Eksternal', to: '/admin/external-links', subKey: 'link_eksternal' },
             { label: 'Export/Import', to: '/admin/export-import/media', icon: 'fas fa-exchange-alt' }
         ]
     },
     {
         key: 'chatbot', label: 'Si Intan', icon: 'fas fa-robot', open: false,
         items: [
-            { label: 'Dashboard', to: '/admin/chatbot' },
-            { label: 'Intent', to: '/admin/chatbot/intent' },
-            { label: 'Live Chat', to: '/admin/chatbot/livechat' },
-            { label: 'Analytics', to: '/admin/chatbot/analytics' },
-            { label: 'Knowledge Base', to: '/admin/chatbot/knowledge-base' },
-            { label: 'Konfigurasi AI', to: '/admin/ai-config' },
-            { label: 'WhatsApp Gateway', to: '/admin/chatbot/whatsapp' },
+            { label: 'Dashboard', to: '/admin/chatbot', subKey: 'chatbot_dashboard' },
+            { label: 'Intent', to: '/admin/chatbot/intent', subKey: 'intent' },
+            { label: 'Live Chat', to: '/admin/chatbot/livechat', subKey: 'livechat' },
+            { label: 'Analytics', to: '/admin/chatbot/analytics', subKey: 'analytics' },
+            { label: 'Knowledge Base', to: '/admin/chatbot/knowledge-base', subKey: 'knowledge_base' },
+            { label: 'Konfigurasi AI', to: '/admin/ai-config', subKey: 'konfigurasi_ai' },
+            { label: 'WhatsApp Gateway', to: '/admin/chatbot/whatsapp', subKey: 'whatsapp' },
             { label: 'Export/Import', to: '/admin/export-import/chatbot', icon: 'fas fa-exchange-alt' }
         ]
     },
     {
         key: 'broadcast', label: 'Broadcast', icon: 'fas fa-bullhorn', open: false,
         items: [
-            { label: 'WhatsApp Broadcast', to: '/admin/wa-broadcast' },
+            { label: 'WhatsApp Broadcast', to: '/admin/wa-broadcast', subKey: 'wa_broadcast' },
             { label: 'Export/Import', to: '/admin/export-import/broadcast', icon: 'fas fa-exchange-alt' }
         ]
     },
     {
         key: 'ppid', label: 'PPID', icon: 'fas fa-university', open: false,
         items: [
-            { label: 'Kelola PPID', to: '/admin/ppid' },
+            { label: 'Kelola PPID', to: '/admin/ppid', subKey: 'kelola_ppid' },
             { label: 'Export/Import', to: '/admin/export-import/ppid', icon: 'fas fa-exchange-alt' }
         ]
     },
     {
         key: 'pengaturan', label: 'Pengaturan', icon: 'fas fa-cog', open: false,
         items: [
-            { label: 'Website', to: '/admin/settings' },
-            { label: 'Tema Website', to: '/admin/theme' },
-            { label: 'Users', to: '/admin/users' },
+            { label: 'Website', to: '/admin/settings', subKey: 'website' },
+            { label: 'Tema Website', to: '/admin/theme', subKey: 'tema_website' },
+            { label: 'Users', to: '/admin/users', subKey: 'users' },
             { label: 'Export/Import', to: '/admin/export-import/pengaturan', icon: 'fas fa-exchange-alt' }
         ]
     }
@@ -134,7 +135,17 @@ const menuGroups = computed(() => {
     if (!allowedMenus.value.length) return [];
     return allMenuGroups
         .filter(g => allowedMenus.value.includes(g.key))
-        .map(g => reactive({ ...g }));
+        .map(g => {
+            const group = reactive({ ...g });
+            const subs = allowedSubMenus.value[g.key];
+            if (subs && subs.length) {
+                group.items = g.items.filter(item => {
+                    if (!item.subKey) return true;
+                    return subs.includes(item.subKey);
+                });
+            }
+            return group;
+        });
 });
 
 function closeMobile() {
@@ -146,9 +157,11 @@ onMounted(async () => {
     try { const { data } = await api.get('/settings'); setting.value = data; } catch (e) {}
     try {
         const { data } = await api.get('/my-menu-access');
-        allowedMenus.value = data || [];
+        allowedMenus.value = data.menus || data || [];
+        allowedSubMenus.value = data.subMenus || {};
     } catch (e) {
         allowedMenus.value = ['dashboard','konten','kategori','media','chatbot','broadcast','ppid','pengaturan'];
+        allowedSubMenus.value = {};
     }
 });
 

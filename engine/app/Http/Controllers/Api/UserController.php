@@ -21,6 +21,62 @@ class UserController extends Controller
         'pengaturan' => 'Pengaturan',
     ];
 
+    private array $allSubMenus = [
+        'konten' => [
+            'berita' => 'Berita',
+            'artikel' => 'Artikel',
+            'buletin' => 'Buletin',
+            'jurnal' => 'Jurnal',
+            'kliping' => 'Kliping',
+            'pengumuman' => 'Pengumuman',
+            'galeri' => 'Galeri',
+            'unduhan' => 'Unduhan',
+            'profil' => 'Profil',
+            'renstra' => 'Renstra',
+            'lakin' => 'Lakin',
+            'perjanjian_kinerja' => 'Perjanjian Kinerja',
+        ],
+        'kategori' => [
+            'berita' => 'Berita',
+            'artikel' => 'Artikel',
+            'buletin' => 'Buletin',
+            'jurnal' => 'Jurnal',
+            'kliping' => 'Kliping',
+            'pengumuman' => 'Pengumuman',
+            'galeri' => 'Galeri',
+            'unduhan' => 'Unduhan',
+            'profil' => 'Profil',
+            'renstra' => 'Renstra',
+            'lakin' => 'Lakin',
+            'perjanjian_kinerja' => 'Perjanjian Kinerja',
+        ],
+        'media' => [
+            'sliders' => 'Sliders',
+            'layanan' => 'Layanan',
+            'link_eksternal' => 'Link Eksternal',
+        ],
+        'chatbot' => [
+            'chatbot_dashboard' => 'Dashboard',
+            'intent' => 'Intent',
+            'livechat' => 'Live Chat',
+            'analytics' => 'Analytics',
+            'knowledge_base' => 'Knowledge Base',
+            'konfigurasi_ai' => 'Konfigurasi AI',
+            'whatsapp' => 'WhatsApp Gateway',
+        ],
+        'broadcast' => [
+            'wa_broadcast' => 'WhatsApp Broadcast',
+        ],
+        'ppid' => [
+            'kelola_ppid' => 'Kelola PPID',
+        ],
+        'pengaturan' => [
+            'website' => 'Website',
+            'tema_website' => 'Tema Website',
+            'users' => 'Users',
+        ],
+    ];
+
     public function index()
     {
         $users = User::select('id', 'name', 'email', 'role', 'id_seksi', 'created_at')
@@ -93,14 +149,36 @@ class UserController extends Controller
 
     public function menus()
     {
-        return response()->json($this->allMenus);
+        return response()->json([
+            'menus' => $this->allMenus,
+            'subMenus' => $this->allSubMenus,
+        ]);
     }
 
     public function getMenuAccess(int $userId)
     {
         $user = User::findOrFail($userId);
-        $access = $user->menuAccess()->pluck('menu_key')->toArray();
-        return response()->json(['user_id' => $userId, 'menus' => $access]);
+        $rows = $user->menuAccess()->select('menu_key', 'sub_menu_key')->get();
+
+        $menus = [];
+        $subMenus = [];
+
+        foreach ($rows as $row) {
+            if ($row->sub_menu_key === null) {
+                $menus[] = $row->menu_key;
+            } else {
+                $menus[] = $row->menu_key;
+                $subMenus[$row->menu_key][] = $row->sub_menu_key;
+            }
+        }
+
+        $menus = array_values(array_unique($menus));
+
+        return response()->json([
+            'user_id' => $userId,
+            'menus' => $menus,
+            'subMenus' => $subMenus,
+        ]);
     }
 
     public function updateMenuAccess(Request $request, int $userId)
@@ -109,26 +187,82 @@ class UserController extends Controller
         $validated = $request->validate([
             'menus' => 'required|array',
             'menus.*' => 'string|max:100',
+            'subMenus' => 'nullable|array',
+            'subMenus.*' => 'nullable|array',
+            'subMenus.*.*' => 'string|max:100',
         ]);
 
         DB::table('user_menu_access')->where('user_id', $userId)->delete();
         $rows = [];
         $now = now();
+
+        $subMenus = $validated['subMenus'] ?? [];
+
         foreach ($validated['menus'] as $menu) {
-            $rows[] = ['user_id' => $userId, 'menu_key' => $menu, 'created_at' => $now, 'updated_at' => $now];
+            if (!empty($subMenus[$menu])) {
+                foreach ($subMenus[$menu] as $subKey) {
+                    $rows[] = [
+                        'user_id' => $userId,
+                        'menu_key' => $menu,
+                        'sub_menu_key' => $subKey,
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ];
+                }
+            } else {
+                $rows[] = [
+                    'user_id' => $userId,
+                    'menu_key' => $menu,
+                    'sub_menu_key' => null,
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ];
+            }
         }
+
         if ($rows) DB::table('user_menu_access')->insert($rows);
 
-        return response()->json(['message' => 'Akses menu berhasil diupdate', 'menus' => $validated['menus']]);
+        return response()->json([
+            'message' => 'Akses menu berhasil diupdate',
+            'menus' => $validated['menus'],
+            'subMenus' => $subMenus,
+        ]);
     }
 
     public function myMenuAccess(Request $request)
     {
         $user = $request->user();
         if ($user->role === 'admin') {
-            return response()->json(array_keys($this->allMenus));
+            $allSubs = [];
+            foreach ($this->allSubMenus as $menu => $subs) {
+                $allSubs[$menu] = array_keys($subs);
+            }
+            return response()->json([
+                'menus' => array_keys($this->allMenus),
+                'subMenus' => $allSubs,
+            ]);
         }
-        $access = DB::table('user_menu_access')->where('user_id', $user->id)->pluck('menu_key')->toArray();
-        return response()->json($access);
+
+        $rows = DB::table('user_menu_access')->where('user_id', $user->id)
+            ->select('menu_key', 'sub_menu_key')->get();
+
+        $menus = [];
+        $subMenus = [];
+
+        foreach ($rows as $row) {
+            if ($row->sub_menu_key === null) {
+                $menus[] = $row->menu_key;
+            } else {
+                $menus[] = $row->menu_key;
+                $subMenus[$row->menu_key][] = $row->sub_menu_key;
+            }
+        }
+
+        $menus = array_values(array_unique($menus));
+
+        return response()->json([
+            'menus' => $menus,
+            'subMenus' => $subMenus,
+        ]);
     }
 }
