@@ -42,15 +42,15 @@
 
                 <form @submit.prevent="handleLogin" class="lp-form" autocomplete="on">
                     <div class="lp-field">
-                        <label class="lp-label">Email</label>
+                        <label class="lp-label">Email atau Username</label>
                         <div class="lp-input-box">
                             <i class="fas fa-envelope lp-input-icon"></i>
                             <input
                                 v-model="form.email"
-                                type="email"
+                                type="text"
                                 name="email"
-                                placeholder="admin@bpmpntb.id"
-                                autocomplete="email"
+                                placeholder="email@bpmpntb.id atau username"
+                                autocomplete="username"
                                 required
                             >
                         </div>
@@ -114,7 +114,6 @@ async function handleLogin() {
     try {
         await ensureCsrf();
         const { data } = await api.post('/login', form.value);
-        localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
         router.push('/admin');
     } catch (e) {

@@ -2,6 +2,7 @@ import axios from 'axios';
 
 const api = axios.create({
     baseURL: '/do.php/api',
+    withCredentials: true,
     headers: {
         'Accept': 'application/json',
         'X-Requested-With': 'XMLHttpRequest',
@@ -21,7 +22,7 @@ let csrfInitialized = false;
 async function ensureCsrf() {
     if (!csrfInitialized) {
         try {
-            await axios.get('/sanctum/csrf-cookie', {  });
+            await axios.get('/sanctum/csrf-cookie', { withCredentials: true });
             csrfInitialized = true;
         } catch (e) {
             console.error('CSRF cookie failed:', e);
@@ -30,17 +31,11 @@ async function ensureCsrf() {
 }
 
 api.interceptors.request.use((config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-    }
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
     if (csrfToken) {
         config.headers['X-CSRF-TOKEN'] = csrfToken;
     }
 
-    // Convert PUT/DELETE/PATCH to POST with _method spoofing
-    // This bypasses hosting firewalls that block non-POST methods
     const method = (config.method || '').toLowerCase();
     if (method === 'put' || method === 'delete' || method === 'patch') {
         const upperMethod = method.toUpperCase();
@@ -62,7 +57,6 @@ api.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response?.status === 401) {
-            localStorage.removeItem('token');
             localStorage.removeItem('user');
             if (window.location.pathname.startsWith('/admin')) {
                 window.location.href = '/login';

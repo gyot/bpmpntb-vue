@@ -126,6 +126,7 @@ const allMenuGroups = [
             { label: 'Website', to: '/admin/settings', subKey: 'website' },
             { label: 'Tema Website', to: '/admin/theme', subKey: 'tema_website' },
             { label: 'Users', to: '/admin/users', subKey: 'users' },
+            { label: 'User SIAMIN', to: '/admin/siamin-users', subKey: 'siamin_users' },
             { label: 'Export/Import', to: '/admin/export-import/pengaturan', icon: 'fas fa-exchange-alt' }
         ]
     }
@@ -153,7 +154,13 @@ function closeMobile() {
 }
 
 onMounted(async () => {
-    try { user.value = JSON.parse(localStorage.getItem('user')); } catch (e) {}
+    try {
+        const { data } = await api.get('/user');
+        user.value = data;
+        localStorage.setItem('user', JSON.stringify(data));
+    } catch (e) {
+        try { user.value = JSON.parse(localStorage.getItem('user')); } catch (e2) {}
+    }
     try { const { data } = await api.get('/settings'); setting.value = data; } catch (e) {}
     try {
         const { data } = await api.get('/my-menu-access');
@@ -167,7 +174,6 @@ onMounted(async () => {
 
 async function logout() {
     try { await api.post('/logout'); } catch (e) {}
-    localStorage.removeItem('token');
     localStorage.removeItem('user');
     router.push('/login');
 }

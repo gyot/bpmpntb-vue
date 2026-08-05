@@ -27,6 +27,9 @@ class Kernel extends HttpKernel
             \App\Http\Middleware\VisitorLogger::class,
         ],
         'api' => [
+            \Illuminate\Cookie\Middleware\EncryptCookies::class,
+            \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
+            \Illuminate\Session\Middleware\StartSession::class,
             \Illuminate\Routing\Middleware\ThrottleRequests::class.':api',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
@@ -45,5 +48,7 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'admin' => \App\Http\Middleware\AdminOnly::class,
+        'siamin.auth' => \App\Http\Middleware\SiaminAuth::class,
+        'siamin.admin' => \App\Http\Middleware\SiaminAdmin::class,
     ];
 }

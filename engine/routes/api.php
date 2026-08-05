@@ -13,33 +13,19 @@ Route::get('/posts-front/{jenis}', [PostController::class, 'listFront']);
 Route::get('/posts-front/{jenis}/{id}', [PostController::class, 'show']);
 Route::get('/layanans-public', [LayananController::class, 'publicIndex']);
 Route::get('/layanans/{id}', [LayananController::class, 'show']);
-
-// PPID Public
 Route::get('/ppid', [PpidController::class, 'publicIndex']);
 
-Route::post('/debug/test-post', function (\Illuminate\Http\Request $request) {
-    return response()->json([
-        'success' => true,
-        'method' => $request->method(),
-        'user' => $request->user()?->email ?? 'guest',
-        'role' => $request->user()?->role ?? 'none',
-        'has_token' => $request->bearerToken() ? 'yes' : 'no',
-        'content_type' => $request->header('Content-Type'),
-        'server' => $request->server('SERVER_SOFTWARE', 'unknown'),
-    ]);
-})->middleware('auth:sanctum');
-
 Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
-Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
+Route::post('/logout', [AuthController::class, 'logout'])->middleware('siamin.auth');
 
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware('siamin.auth')->group(function () {
     Route::get('/user', [AuthController::class, 'user']);
     Route::get('/posts/{jenis}', [PostController::class, 'index']);
     Route::post('/quil-upload-image', [PostController::class, 'uploadImage']);
     Route::get('/kategori/{jenis}', [PostController::class, 'kategoriIndex']);
 });
 
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['siamin.auth', 'siamin.admin'])->group(function () {
     Route::get('/dashboard-stats', [PostController::class, 'dashboardStats']);
     Route::apiResource('sliders', SliderController::class)->except(['show']);
     Route::post('/sliders/reorder', [SliderController::class, 'reorder']);
@@ -82,7 +68,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/ppid/external-links/{id}', [PpidController::class, 'externalLinksUpdate']);
     Route::delete('/ppid/external-links/{id}', [PpidController::class, 'externalLinksDestroy']);
     Route::post('/ppid/external-links/reorder', [PpidController::class, 'externalLinksReorder']);
-
     Route::get('/ppid/annual-reports', [PpidController::class, 'annualReportIndex']);
     Route::post('/ppid/annual-reports', [PpidController::class, 'annualReportStore']);
     Route::put('/ppid/annual-reports/{id}', [PpidController::class, 'annualReportUpdate']);
@@ -114,4 +99,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/export-import/{type}/template', [ExportImportController::class, 'downloadTemplate']);
     Route::get('/export-import/{type}', [ExportImportController::class, 'export']);
     Route::post('/export-import/{type}', [ExportImportController::class, 'import']);
+
+    // SIAMIN User Management
+    Route::get('/siamin/users', [AuthController::class, 'siaminUsers']);
+    Route::post('/siamin/set-role', [AuthController::class, 'setRole']);
+    Route::delete('/siamin/revoke-role/{id_user}', [AuthController::class, 'revokeRole']);
+    Route::get('/siamin/local-roles', [AuthController::class, 'localRoles']);
 });

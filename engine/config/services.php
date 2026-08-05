@@ -31,4 +31,9 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'siamin' => [
+        'base_url' => env('SIAMIN_BASE_URL', 'https://api-siamin.bpmpntb.id'),
+        'timeout' => env('SIAMIN_TIMEOUT', 15),
+    ],
+
 ];

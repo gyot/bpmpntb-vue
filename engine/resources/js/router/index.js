@@ -16,6 +16,7 @@ const routes = [
             { path: 'settings', name: 'admin.settings', component: () => import('@/pages/admin/WebsiteSettings.vue') },
             { path: 'sliders', name: 'admin.sliders', component: () => import('@/pages/admin/SliderManager.vue') },
             { path: 'users', name: 'admin.users', component: () => import('@/pages/admin/UserManager.vue') },
+            { path: 'siamin-users', name: 'admin.siamin-users', component: () => import('@/pages/admin/SiaminUserManager.vue') },
             { path: 'external-links', name: 'admin.external-links', component: () => import('@/pages/admin/ExternalLinkManager.vue') },
             { path: 'layanans', name: 'admin.layanans', component: () => import('@/pages/admin/LayananManager.vue') },
             { path: 'konten/:jenis', name: 'admin.konten', component: () => import('@/pages/admin/KontenManager.vue') },
@@ -45,8 +46,8 @@ const router = createRouter({
 
 router.beforeEach(async (to, from, next) => {
     if (to.meta.requiresAuth) {
-        const token = localStorage.getItem('token');
-        if (!token) {
+        const user = localStorage.getItem('user');
+        if (!user) {
             return next({ name: 'login' });
         }
     }

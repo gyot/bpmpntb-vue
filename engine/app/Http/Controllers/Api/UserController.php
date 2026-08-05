@@ -104,9 +104,8 @@ class UserController extends Controller
     public function update(Request $request, int $id)
     {
         $target = User::findOrFail($id);
-        $currentUser = $request->user();
 
-        if ($target->role === 'superadmin' && $currentUser->role !== 'superadmin') {
+        if ($target->role === 'superadmin' && session('local_role') !== 'superadmin') {
             return response()->json(['message' => 'Tidak bisa mengedit superadmin'], 403);
         }
 
@@ -132,9 +131,9 @@ class UserController extends Controller
     public function destroy(Request $request, int $id)
     {
         $target = User::findOrFail($id);
-        $currentUser = $request->user();
+        $currentUserId = session('siamin_user.id_user');
 
-        if ($target->id === $currentUser->id) {
+        if ($target->id === $currentUserId) {
             return response()->json(['message' => 'Tidak bisa menghapus akun sendiri'], 422);
         }
 
@@ -231,8 +230,10 @@ class UserController extends Controller
 
     public function myMenuAccess(Request $request)
     {
-        $user = $request->user();
-        if ($user->role === 'admin') {
+        $role = session('local_role');
+        $id_user = session('siamin_user.id_user');
+
+        if ($role === 'admin') {
             $allSubs = [];
             foreach ($this->allSubMenus as $menu => $subs) {
                 $allSubs[$menu] = array_keys($subs);
@@ -243,7 +244,7 @@ class UserController extends Controller
             ]);
         }
 
-        $rows = DB::table('user_menu_access')->where('user_id', $user->id)
+        $rows = DB::table('user_menu_access')->where('user_id', $id_user)
             ->select('menu_key', 'sub_menu_key')->get();
 
         $menus = [];
