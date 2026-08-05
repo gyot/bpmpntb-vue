@@ -126,7 +126,6 @@ const allMenuGroups = [
             { label: 'Website', to: '/admin/settings', subKey: 'website' },
             { label: 'Tema Website', to: '/admin/theme', subKey: 'tema_website' },
             { label: 'Users', to: '/admin/users', subKey: 'users' },
-            { label: 'User SIAMIN', to: '/admin/siamin-users', subKey: 'siamin_users' },
             { label: 'Export/Import', to: '/admin/export-import/pengaturan', icon: 'fas fa-exchange-alt' }
         ]
     }
