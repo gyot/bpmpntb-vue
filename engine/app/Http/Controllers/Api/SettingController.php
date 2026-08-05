@@ -58,6 +58,12 @@ class SettingController extends Controller
             'ikm_score' => 'nullable|numeric|min:0|max:100',
             'ikm_period' => 'nullable|string|max:100',
             'ikm_link' => 'nullable|url|max:500',
+            'silamo_title' => 'nullable|string|max:255',
+            'silamo_subtitle' => 'nullable|string|max:255',
+            'silamo_schedule' => 'nullable|string|max:255',
+            'silamo_meeting_id' => 'nullable|string|max:100',
+            'silamo_password' => 'nullable|string|max:100',
+            'silamo_link' => 'nullable|url|max:500',
         ];
 
         $validated = $request->validate($rules);

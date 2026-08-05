@@ -58,6 +58,21 @@
                 </div>
             </div>
             <div class="card p-6">
+                <h3 class="text-sm font-semibold mb-5 flex items-center gap-2" style="color:var(--color-text-primary)"><i class="fas fa-video" style="color:var(--color-primary)"></i>SILAMO (Sistem Layanan Melalui Online)</h3>
+                <div class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div><label class="block text-xs font-semibold uppercase tracking-wider mb-2" style="color:var(--color-text-secondary)">Judul</label><input v-model="form.silamo_title" type="text" class="input-field" placeholder="SILAMO (Sistem Layanan Melalui Online)"></div>
+                        <div><label class="block text-xs font-semibold uppercase tracking-wider mb-2" style="color:var(--color-text-secondary)">Subtitle</label><input v-model="form.silamo_subtitle" type="text" class="input-field" placeholder="BPMP Provinsi NTB"></div>
+                    </div>
+                    <div><label class="block text-xs font-semibold uppercase tracking-wider mb-2" style="color:var(--color-text-secondary)">Jadwal</label><input v-model="form.silamo_schedule" type="text" class="input-field" placeholder="Senin s.d Jumat: 09.00 s.d. 11.00 WITA"></div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div><label class="block text-xs font-semibold uppercase tracking-wider mb-2" style="color:var(--color-text-secondary)">Meeting ID</label><input v-model="form.silamo_meeting_id" type="text" class="input-field" placeholder="349 664 0348"></div>
+                        <div><label class="block text-xs font-semibold uppercase tracking-wider mb-2" style="color:var(--color-text-secondary)">Password</label><input v-model="form.silamo_password" type="text" class="input-field" placeholder="ultbpmpntb"></div>
+                    </div>
+                    <div><label class="block text-xs font-semibold uppercase tracking-wider mb-2" style="color:var(--color-text-secondary)">Link Zoom</label><input v-model="form.silamo_link" type="url" class="input-field" placeholder="https://us06web.zoom.us/my/bpmpntb?pwd=..."></div>
+                </div>
+            </div>
+            <div class="card p-6">
                 <h3 class="text-sm font-semibold mb-5 flex items-center gap-2" style="color:var(--color-text-primary)"><i class="fas fa-bars" style="color:var(--color-primary)"></i>Navigasi Website</h3>
                 <p class="text-xs mb-4" style="color:var(--color-text-secondary)">Tambah menu dan submenu yang akan tampil di navigasi utama website. Geser untuk mengurutkan, gunakan indent untuk membuat submenu.</p>
                 <div class="flex gap-2 mb-4">
@@ -98,7 +113,7 @@ import api from '@/bootstrap.js';
 import { swalSuccess, swalError } from '@/swal.js';
 
 const setting = ref(null); const success = ref(''); const error = ref(''); const saving = ref(false);
-const form = reactive({title:'',description:'',footer:'',alamat:'',phone:'',hp:'',email:'',whatsapp:'',facebook:'',twitter:'',instagram:'',youtube:'',map:'',ikm_score:'',ikm_period:'',ikm_link:'',logo:null,favicon:null});
+const form = reactive({title:'',description:'',footer:'',alamat:'',phone:'',hp:'',email:'',whatsapp:'',facebook:'',twitter:'',instagram:'',youtube:'',map:'',ikm_score:'',ikm_period:'',ikm_link:'',silamo_title:'',silamo_subtitle:'',silamo_schedule:'',silamo_meeting_id:'',silamo_password:'',silamo_link:'',logo:null,favicon:null});
 const navItems = ref([]); const navForm = reactive({title:'',link:''});
 function genId(){return Math.random().toString(36).substring(2,10);}
 function addNavItem(){if(!navForm.title.trim())return;navItems.value.push({_id:genId(),title:navForm.title.trim(),link:navForm.link.trim(),level:0});navForm.title='';navForm.link='';}

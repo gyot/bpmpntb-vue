@@ -105,6 +105,45 @@
             </div>
         </section>
 
+        <section v-if="setting?.silamo_link" class="py-12 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="card overflow-hidden border-t-4" style="border-color:var(--color-primary)">
+                    <div class="grid md:grid-cols-2 gap-0">
+                        <div class="p-8 md:p-10">
+                            <div class="inline-block mb-4 px-3 py-1 rounded-full text-xs font-bold text-white" style="background:var(--color-primary)">
+                                <i class="fas fa-video mr-1.5"></i>LAYANAN ONLINE
+                            </div>
+                            <h2 class="text-2xl md:text-3xl font-bold mb-2" style="color:var(--color-text-primary)">{{ setting.silamo_title || 'SILAMO (Sistem Layanan Melalui Online)' }}</h2>
+                            <p class="text-sm font-semibold mb-6" style="color:var(--color-primary)">{{ setting.silamo_subtitle || 'BPMP Provinsi NTB' }}</p>
+                            <div class="space-y-3 mb-6">
+                                <div class="flex items-center gap-3 text-sm" style="color:var(--color-text-secondary)">
+                                    <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style="background:color-mix(in srgb, var(--color-primary) 10%, transparent)"><i class="fas fa-clock text-xs" style="color:var(--color-primary)"></i></div>
+                                    {{ setting.silamo_schedule || 'Senin s.d Jumat: 09.00 s.d. 11.00 WITA' }}
+                                </div>
+                                <div class="flex items-center gap-3 text-sm" style="color:var(--color-text-secondary)">
+                                    <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style="background:color-mix(in srgb, var(--color-primary) 10%, transparent)"><i class="fas fa-key text-xs" style="color:var(--color-primary)"></i></div>
+                                    ID: <span class="font-mono font-semibold" style="color:var(--color-text-primary)">{{ setting.silamo_meeting_id || '349 664 0348' }}</span>
+                                </div>
+                                <div class="flex items-center gap-3 text-sm" style="color:var(--color-text-secondary)">
+                                    <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style="background:color-mix(in srgb, var(--color-primary) 10%, transparent)"><i class="fas fa-lock text-xs" style="color:var(--color-primary)"></i></div>
+                                    Sandi: <span class="font-mono font-semibold" style="color:var(--color-text-primary)">{{ setting.silamo_password || 'ultbpmpntb' }}</span>
+                                </div>
+                            </div>
+                            <a :href="setting.silamo_link" target="_blank" class="inline-flex items-center gap-2 py-3 px-6 rounded-full text-sm font-bold text-white shadow-lg transition-all hover:shadow-xl" style="background:var(--color-primary)">
+                                <i class="fas fa-video"></i> Bergabung Zoom SILAMO
+                            </a>
+                        </div>
+                        <div class="hidden md:flex items-center justify-center p-8" style="background:color-mix(in srgb, var(--color-primary) 4%, transparent)">
+                            <div class="text-center">
+                                <img :src="'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data='+encodeURIComponent(setting.silamo_link)" alt="QR Code SILAMO" class="w-48 h-48 rounded-xl shadow-lg mx-auto mb-4" loading="lazy">
+                                <p class="text-xs font-semibold" style="color:var(--color-text-secondary)">Scan QR untuk bergabung</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <section class="py-12 bg-white">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex items-end justify-between mb-6">
