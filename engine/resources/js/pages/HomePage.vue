@@ -133,10 +133,10 @@
                                 <i class="fas fa-video"></i> Bergabung Zoom SILAMO
                             </a>
                         </div>
-                        <div class="hidden md:flex items-center justify-center p-8" style="background:color-mix(in srgb, var(--color-primary) 4%, transparent)">
+                        <div class="hidden md:flex items-center justify-center p-6" style="background:color-mix(in srgb, var(--color-primary) 4%, transparent)">
                             <div class="text-center">
-                                <img :src="'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data='+encodeURIComponent(setting.silamo_link)" alt="QR Code SILAMO" class="w-48 h-48 rounded-xl shadow-lg mx-auto mb-4" loading="lazy">
-                                <p class="text-xs font-semibold" style="color:var(--color-text-secondary)">Scan QR untuk bergabung</p>
+                                <img :src="'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data='+encodeURIComponent(setting.silamo_link)" alt="QR Code SILAMO" class="w-32 h-32 rounded-lg shadow mx-auto mb-3" loading="lazy">
+                                <p class="text-[10px] font-semibold" style="color:var(--color-text-secondary)">Scan QR untuk bergabung</p>
                             </div>
                         </div>
                     </div>
