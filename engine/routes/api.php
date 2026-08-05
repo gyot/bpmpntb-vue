@@ -83,6 +83,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/ppid/external-links/{id}', [PpidController::class, 'externalLinksDestroy']);
     Route::post('/ppid/external-links/reorder', [PpidController::class, 'externalLinksReorder']);
 
+    Route::get('/ppid/annual-reports', [PpidController::class, 'annualReportIndex']);
+    Route::post('/ppid/annual-reports', [PpidController::class, 'annualReportStore']);
+    Route::put('/ppid/annual-reports/{id}', [PpidController::class, 'annualReportUpdate']);
+    Route::delete('/ppid/annual-reports/{id}', [PpidController::class, 'annualReportDestroy']);
+
     Route::get('/chatbot-responses', [ChatbotController::class, 'keywordIndex']);
     Route::post('/chatbot-responses', [ChatbotController::class, 'keywordStore']);
     Route::put('/chatbot-responses/{id}', [ChatbotController::class, 'keywordUpdate']);

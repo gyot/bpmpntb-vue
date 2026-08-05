@@ -103,23 +103,60 @@
 
                 <div v-if="activeTab==='regulasi'" class="animate-fade-in">
                     <h2 class="text-2xl font-bold mb-6" style="color:var(--color-text-primary)">Regulasi</h2>
-                    <div v-if="regulations.length" class="space-y-3">
-                        <div v-for="item in regulations" :key="item.id" class="card p-5 flex items-center gap-4 hover:shadow-md transition">
-                            <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style="background:color-mix(in srgb, var(--color-secondary) 10%, transparent)"><i class="fas fa-gavel" style="color:var(--color-secondary)"></i></div>
-                            <div class="flex-1 min-w-0">
-                                <h4 class="font-semibold" style="color:var(--color-text-primary)">{{ item.title }}</h4>
-                                <div class="flex items-center gap-2 mt-1">
-                                    <span v-if="item.nomor" class="text-xs font-mono px-2 py-0.5 rounded bg-gray-100" style="color:var(--color-text-secondary)">{{ item.nomor }}</span>
-                                    <span v-if="item.tanggal" class="text-xs" style="color:var(--color-text-secondary)">{{ formatDate(item.tanggal) }}</span>
-                                </div>
+                    <div v-if="profile?.regulasi_profil" class="card p-8 mb-6">
+                        <div class="prose max-w-none" v-html="profile.regulasi_profil"></div>
+                    </div>
+                    <div v-if="regulations.length" class="mb-4">
+                        <div class="relative">
+                            <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                            <input v-model="regSearch" type="text" placeholder="Cari regulasi..." class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition" style="font-family:inherit">
+                        </div>
+                    </div>
+                    <div v-if="filteredRegulations.length" class="space-y-4">
+                        <div v-for="item in filteredRegulations" :key="item.id" class="card p-6 hover:shadow-md transition">
+                            <h3 class="text-lg font-bold mb-2" style="color:var(--color-text-primary)">{{ item.title }}</h3>
+                            <div v-if="item.description" class="prose prose-sm max-w-none mb-4" style="color:var(--color-text-secondary)" v-html="item.description"></div>
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span v-if="item.pembuat" class="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full" style="background:color-mix(in srgb, var(--color-primary) 10%, transparent);color:var(--color-primary)">
+                                    <i class="fas fa-building text-[10px]"></i>{{ item.pembuat }}
+                                </span>
+                                <span v-if="item.tanggal" class="inline-flex items-center gap-1.5 text-xs px-3 py-1 rounded-full bg-gray-100" style="color:var(--color-text-secondary)">
+                                    <i class="fas fa-calendar text-[10px]"></i>{{ getYear(item.tanggal) }}
+                                </span>
                             </div>
-                            <div class="flex gap-2 flex-shrink-0">
-                                <a v-if="item.file" :href="'/upload/ppid/'+item.file" class="btn-ghost text-xs" download><i class="fas fa-download mr-1"></i>Download</a>
-                                <a v-if="item.link" :href="item.link" target="_blank" class="btn-ghost text-xs"><i class="fas fa-external-link-alt mr-1"></i>Link</a>
+                            <div class="flex gap-2 mt-4">
+                                <a v-if="item.file" :href="'/upload/ppid/'+item.file" class="btn-ghost text-xs border border-gray-200 rounded-lg px-3 py-1.5" download><i class="fas fa-download mr-1"></i>Download</a>
+                                <a v-if="item.link" :href="item.link" target="_blank" class="btn-ghost text-xs border border-gray-200 rounded-lg px-3 py-1.5"><i class="fas fa-external-link-alt mr-1"></i>Link</a>
                             </div>
                         </div>
                     </div>
-                    <div v-else class="card p-12 text-center"><i class="fas fa-gavel text-4xl text-gray-300 mb-3"></i><p style="color:var(--color-text-secondary)">Belum ada regulasi</p></div>
+                    <div v-else-if="regSearch && regulations.length" class="card p-12 text-center">
+                        <i class="fas fa-search text-4xl text-gray-300 mb-3"></i>
+                        <p style="color:var(--color-text-secondary)">Tidak ada regulasi yang cocok dengan pencarian "<strong>{{ regSearch }}</strong>"</p>
+                    </div>
+                    <div v-else-if="!regulations.length" class="card p-12 text-center"><i class="fas fa-gavel text-4xl text-gray-300 mb-3"></i><p style="color:var(--color-text-secondary)">Belum ada regulasi</p></div>
+                </div>
+
+                <div v-if="activeTab==='laporan'" class="animate-fade-in">
+                    <h2 class="text-2xl font-bold mb-6" style="color:var(--color-text-primary)">Laporan Tahunan</h2>
+                    <div v-if="annualReports.length" class="grid md:grid-cols-2 gap-5">
+                        <div v-for="item in annualReports" :key="item.id" class="card p-6 hover:shadow-lg hover:-translate-y-1 transition-all">
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style="background:color-mix(in srgb, var(--color-primary) 10%, transparent)">
+                                    <i class="fas fa-file-alt text-xl" style="color:var(--color-primary)"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <h3 class="font-bold mb-1" style="color:var(--color-text-primary)">{{ item.title }}</h3>
+                                    <div v-if="item.description" class="prose prose-sm max-w-none mb-4" style="color:var(--color-text-secondary)" v-html="item.description"></div>
+                                    <div class="flex flex-wrap gap-2 mt-3">
+                                        <a v-if="item.link" :href="item.link" target="_blank" class="inline-flex items-center gap-1.5 text-xs font-semibold px-4 py-2 rounded-lg text-white transition" style="background:var(--color-primary)"><i class="fas fa-eye"></i>Lihat</a>
+                                        <a v-if="item.file" :href="'/upload/ppid/'+item.file" class="inline-flex items-center gap-1.5 text-xs font-semibold px-4 py-2 rounded-lg border border-gray-200 transition hover:bg-gray-50" style="color:var(--color-text-primary)" download><i class="fas fa-download"></i>Unduh</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div v-else class="card p-12 text-center"><i class="fas fa-file-alt text-4xl text-gray-300 mb-3"></i><p style="color:var(--color-text-secondary)">Belum ada laporan tahunan</p></div>
                 </div>
 
                 <div v-if="activeTab==='maklumat'" class="animate-fade-in">
@@ -175,7 +212,7 @@
 </template>
 
 <script setup>
-import {ref,onMounted} from 'vue';
+import {ref,computed,onMounted} from 'vue';
 import api from '@/bootstrap.js';
 import PublicLayout from '@/layouts/PublicLayout.vue';
 
@@ -186,9 +223,22 @@ const informations = ref({berkala:[],setiap_saat:[],serta_merta:[]});
 const allInformations = ref([]);
 const standards = ref([]);
 const regulations = ref([]);
+const annualReports = ref([]);
 const externalLinks = ref([]);
 const setting = ref(null);
 const viewStd = ref(null);
+const regSearch = ref('');
+
+const filteredRegulations = computed(() => {
+    if (!regSearch.value.trim()) return regulations.value;
+    const q = regSearch.value.toLowerCase();
+    return regulations.value.filter(r =>
+        (r.title && r.title.toLowerCase().includes(q)) ||
+        (r.nomor && r.nomor.toLowerCase().includes(q)) ||
+        (r.pembuat && r.pembuat.toLowerCase().includes(q)) ||
+        (r.description && r.description.toLowerCase().includes(q))
+    );
+});
 
 const tabs = [
     {id:'profil',label:'Profil',icon:'fas fa-building'},
@@ -197,12 +247,14 @@ const tabs = [
     {id:'informasi',label:'Jenis Informasi',icon:'fas fa-info-circle'},
     {id:'standar',label:'Standar Pelayanan',icon:'fas fa-clipboard-list'},
     {id:'regulasi',label:'Regulasi',icon:'fas fa-gavel'},
+    {id:'laporan',label:'Laporan Tahunan',icon:'fas fa-file-alt'},
     {id:'maklumat',label:'Maklumat',icon:'fas fa-scroll'},
     {id:'permohonan',label:'Permohonan Info',icon:'fas fa-paper-plane'},
 ];
 
 const bulanIndo=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
 function formatDate(tgl){if(!tgl)return'-';const d=new Date(tgl);return isNaN(d)?tgl:`${d.getDate()} ${bulanIndo[d.getMonth()]} ${d.getFullYear()}`;}
+function getYear(tgl){if(!tgl)return'';const d=new Date(tgl);return isNaN(d)?tgl.substring(0,4):d.getFullYear();}
 
 onMounted(async()=>{
     const[ppid,st]=await Promise.allSettled([api.get('/ppid'),api.get('/settings')]);
@@ -212,6 +264,7 @@ onMounted(async()=>{
         allInformations.value=ppid.value.data.informations?.informasi||[];
         standards.value=ppid.value.data.standards||[];
         regulations.value=ppid.value.data.regulations||[];
+        annualReports.value=ppid.value.data.annualReports||[];
         externalLinks.value=ppid.value.data.externalLinks||[];
     }
     if(st.status==='fulfilled')setting.value=st.value.data;

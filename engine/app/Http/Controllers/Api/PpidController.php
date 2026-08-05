@@ -1,7 +1,7 @@
 <?php
 namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
-use App\Models\{PpidProfile, PpidInformation, PpidStandard, PpidRegulation, PpidExternalLink};
+use App\Models\{PpidProfile, PpidInformation, PpidStandard, PpidRegulation, PpidExternalLink, PpidAnnualReport};
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -20,7 +20,8 @@ class PpidController extends Controller
         $standards = PpidStandard::where("status",1)->orderBy("order")->get();
         $regulations = PpidRegulation::where("status",1)->orderBy("order")->get();
         $externalLinks = PpidExternalLink::where("status",1)->orderBy("order")->get();
-        return response()->json(compact("profile","informations","standards","regulations","externalLinks"));
+        $annualReports = PpidAnnualReport::where("status",1)->orderBy("order")->get();
+        return response()->json(compact("profile","informations","standards","regulations","externalLinks","annualReports"));
     }
 
     // Admin CRUD - Profile
@@ -44,6 +45,7 @@ class PpidController extends Controller
             "permohonan_email" => "nullable|string|max:255",
             "permohonan_phone" => "nullable|string|max:50",
             "struktur_image" => "nullable|image|mimes:jpg,jpeg,png|max:5120",
+            "regulasi_profil" => "nullable|string",
         ];
         $validated = $request->validate($rules);
         $profile = PpidProfile::first() ?? new PpidProfile();
@@ -190,6 +192,7 @@ class PpidController extends Controller
         $v = $request->validate([
             "title" => "required|string|max:500",
             "nomor" => "nullable|string|max:255",
+            "pembuat" => "nullable|string|max:255",
             "description" => "nullable|string",
             "file" => "nullable|file|max:10240",
             "link" => "nullable|string|max:500",
@@ -213,6 +216,7 @@ class PpidController extends Controller
         $v = $request->validate([
             "title" => "required|string|max:500",
             "nomor" => "nullable|string|max:255",
+            "pembuat" => "nullable|string|max:255",
             "description" => "nullable|string",
             "file" => "nullable|file|max:10240",
             "link" => "nullable|string|max:500",
@@ -289,5 +293,61 @@ class PpidController extends Controller
             PpidExternalLink::where("id", (int)$id)->update(["order" => $i + 1]);
         }
         return response()->json(["status"=>"success"]);
+    }
+
+    // Admin CRUD - Annual Reports
+    public function annualReportIndex() { return response()->json(PpidAnnualReport::orderBy("order")->get()); }
+    public function annualReportStore(Request $request)
+    {
+        $v = $request->validate([
+            "title" => "required|string|max:500",
+            "description" => "nullable|string",
+            "file" => "nullable|file|max:51200",
+            "link" => "nullable|string|max:500",
+            "status" => "required|in:0,1",
+        ]);
+        if ($request->hasFile("file")) {
+            $ext = strtolower($request->file("file")->getClientOriginalExtension());
+            $filename = Str::random(20) . "." . $ext;
+            $dir = public_path("upload/ppid");
+            if (!is_dir($dir)) mkdir($dir, 0755, true);
+            $request->file("file")->move($dir, $filename);
+            $v["file"] = $filename;
+        }
+        $v["order"] = PpidAnnualReport::max("order") + 1;
+        return response()->json(PpidAnnualReport::create($v), 201);
+    }
+    public function annualReportUpdate(Request $request, int $id)
+    {
+        $item = PpidAnnualReport::findOrFail($id);
+        $v = $request->validate([
+            "title" => "required|string|max:500",
+            "description" => "nullable|string",
+            "file" => "nullable|file|max:51200",
+            "link" => "nullable|string|max:500",
+            "status" => "required|in:0,1",
+        ]);
+        if ($request->hasFile("file")) {
+            $old = public_path("upload/ppid/" . $item->file);
+            if ($item->file && file_exists($old)) unlink($old);
+            $ext = strtolower($request->file("file")->getClientOriginalExtension());
+            $filename = Str::random(20) . "." . $ext;
+            $dir = public_path("upload/ppid");
+            if (!is_dir($dir)) mkdir($dir, 0755, true);
+            $request->file("file")->move($dir, $filename);
+            $v["file"] = $filename;
+        }
+        $item->update($v);
+        return response()->json($item);
+    }
+    public function annualReportDestroy(int $id)
+    {
+        $item = PpidAnnualReport::findOrFail($id);
+        if ($item->file) {
+            $old = public_path("upload/ppid/" . $item->file);
+            if (file_exists($old)) unlink($old);
+        }
+        $item->delete();
+        return response()->json(["message"=>"Dihapus"]);
     }
 }

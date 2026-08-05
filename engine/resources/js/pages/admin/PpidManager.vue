@@ -112,25 +112,65 @@
     <!-- REGULASI -->
     <div v-if="activeTab==='regulations'" class="animate-fade-in">
         <div class="card p-6 mb-6">
+            <h3 class="text-sm font-bold mb-4" style="color:var(--color-text-primary)">Profil Regulasi</h3>
+            <p class="text-xs mb-4" style="color:var(--color-text-secondary)">Teks pengantar yang ditampilkan di atas daftar regulasi pada halaman publik.</p>
+            <div class="space-y-4 mb-4">
+                <div><label class="input-label">Deskripsi Regulasi</label><QuillEditor style="height: 300px" v-model="regulasiProfilForm.regulasi_profil" placeholder="Tulis deskripsi umum tentang regulasi..." /></div>
+            </div>
+            <button @click="saveRegulasiProfil" class="btn-primary"><i class="fas fa-save mr-2"></i>Simpan Profil Regulasi</button>
+        </div>
+        <div class="card p-6 mb-6">
             <h3 class="text-sm font-bold mb-4" style="color:var(--color-text-primary)">{{ editRegId?'Edit':'Tambah' }} Regulasi</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div><label class="input-label">Judul</label><input v-model="regForm.title" class="input-field" required></div>
                 <div><label class="input-label">Nomor</label><input v-model="regForm.nomor" class="input-field"></div>
-                <div class="md:col-span-2"><label class="input-label">Deskripsi</label><QuillEditor v-model="regForm.description" placeholder="Deskripsi regulasi..." /></div>
+                <div><label class="input-label">Pembuat Peraturan</label><input v-model="regForm.pembuat" class="input-field" placeholder="cth: Peraturan Menteri"></div>
                 <div><label class="input-label">Tanggal</label><input v-model="regForm.tanggal" type="date" class="input-field"></div>
+                <div class="md:col-span-2"><label class="input-label">Deskripsi</label><QuillEditor v-model="regForm.description" placeholder="Deskripsi regulasi..." /></div>
                 <div><label class="input-label">Link URL</label><input v-model="regForm.link" class="input-field" placeholder="https://..."></div>
                 <div><label class="input-label">File</label><input type="file" @change="e=>regForm.file=e.target.files[0]" class="input-field"></div>
                 <div><label class="input-label">Status</label><select v-model="regForm.status" class="input-field"><option :value="1">Aktif</option><option :value="0">Nonaktif</option></select></div>
             </div>
             <div class="flex gap-2">
                 <button @click="saveReg" class="btn-primary"><i class="fas fa-save mr-2"></i>{{ editRegId?'Update':'Simpan' }}</button>
-                <button v-if="editRegId" @click="editRegId=null;regForm={title:'',nomor:'',description:'',link:'',file:null,tanggal:'',status:1}" class="btn-ghost border border-gray-200">Batal</button>
+                <button v-if="editRegId" @click="editRegId=null;regForm={title:'',nomor:'',pembuat:'',description:'',link:'',file:null,tanggal:'',status:1}" class="btn-ghost border border-gray-200">Batal</button>
             </div>
         </div>
         <div class="card overflow-hidden">
             <table class="w-full"><thead class="bg-gray-50"><tr><th class="table-header">#</th><th class="table-header">Judul</th><th class="table-header">Nomor</th><th class="table-header">Tanggal</th><th class="table-header">Status</th><th class="table-header">Aksi</th></tr></thead>
             <tbody><tr v-for="item in allRegulations" :key="item.id" class="border-t"><td class="table-cell text-gray-400">{{ item.id }}</td><td class="table-cell font-medium" style="color:var(--color-text-primary)">{{ item.title }}</td><td class="table-cell text-sm" style="color:var(--color-text-secondary)">{{ item.nomor||'-' }}</td><td class="table-cell text-sm" style="color:var(--color-text-secondary)">{{ item.tanggal||'-' }}</td><td class="table-cell"><span :class="item.status===1?'badge-success':'badge-warning'" class="badge text-[10px]">{{ item.status===1?'Aktif':'Nonaktif' }}</span></td><td class="table-cell"><div class="flex gap-1"><button @click="editReg(item)" class="p-2 rounded-lg hover:bg-blue-50" style="color:var(--color-primary)"><i class="fas fa-edit text-sm"></i></button><button @click="deleteReg(item.id)" class="p-2 rounded-lg hover:bg-red-50 text-red-500"><i class="fas fa-trash text-sm"></i></button></div></td></tr></tbody></table>
             <div v-if="!allRegulations.length" class="text-center py-8 text-gray-400">Belum ada data</div>
+        </div>
+    </div>
+
+    <!-- LAPORAN TAHUNAN -->
+    <div v-if="activeTab==='annualReports'" class="animate-fade-in">
+        <div class="card p-6 mb-6">
+            <h3 class="text-sm font-bold mb-4" style="color:var(--color-text-primary)">{{ editArId?'Edit':'Tambah' }} Laporan Tahunan</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div><label class="input-label">Judul</label><input v-model="arForm.title" class="input-field" placeholder="cth: Laporan Tahunan 2024" required></div>
+                <div><label class="input-label">Link URL</label><input v-model="arForm.link" class="input-field" placeholder="https://..."></div>
+                <div class="md:col-span-2"><label class="input-label">Deskripsi</label><QuillEditor v-model="arForm.description" placeholder="Deskripsi laporan tahunan..." /></div>
+                <div>
+                    <label class="input-label">File</label>
+                    <div v-if="arForm.existingFile && !arForm.file" class="flex items-center gap-2 mb-2 p-2 bg-gray-50 rounded-lg">
+                        <i class="fas fa-file-pdf text-red-500"></i>
+                        <a :href="'/upload/ppid/'+arForm.existingFile" target="_blank" class="text-sm text-blue-600 underline">{{ arForm.existingFile }}</a>
+                        <button @click="arForm.existingFile=null" class="ml-auto text-red-500 text-xs"><i class="fas fa-times"></i></button>
+                    </div>
+                    <input type="file" @change="e=>arForm.file=e.target.files[0]" class="input-field">
+                </div>
+                <div><label class="input-label">Status</label><select v-model="arForm.status" class="input-field"><option :value="1">Aktif</option><option :value="0">Nonaktif</option></select></div>
+            </div>
+            <div class="flex gap-2">
+                <button @click="saveAr" class="btn-primary"><i class="fas fa-save mr-2"></i>{{ editArId?'Update':'Simpan' }}</button>
+                <button v-if="editArId" @click="resetArForm" class="btn-ghost border border-gray-200">Batal</button>
+            </div>
+        </div>
+        <div class="card overflow-hidden">
+            <table class="w-full"><thead class="bg-gray-50"><tr><th class="table-header">#</th><th class="table-header">Judul</th><th class="table-header">File</th><th class="table-header">Status</th><th class="table-header">Aksi</th></tr></thead>
+            <tbody><tr v-for="item in annualReports" :key="item.id" class="border-t"><td class="table-cell text-gray-400">{{ item.id }}</td><td class="table-cell font-medium" style="color:var(--color-text-primary)">{{ item.title }}</td><td class="table-cell"><a v-if="item.file" :href="'/upload/ppid/'+item.file" target="_blank" class="text-blue-600 text-xs underline"><i class="fas fa-file-pdf mr-1"></i>PDF</a><span v-else class="text-gray-300 text-xs">-</span></td><td class="table-cell"><span :class="item.status===1?'badge-success':'badge-warning'" class="badge text-[10px]">{{ item.status===1?'Aktif':'Nonaktif' }}</span></td><td class="table-cell"><div class="flex gap-1"><button @click="editAr(item)" class="p-2 rounded-lg hover:bg-blue-50" style="color:var(--color-primary)"><i class="fas fa-edit text-sm"></i></button><button @click="deleteAr(item.id)" class="p-2 rounded-lg hover:bg-red-50 text-red-500"><i class="fas fa-trash text-sm"></i></button></div></td></tr></tbody></table>
+            <div v-if="!annualReports.length" class="text-center py-8 text-gray-400">Belum ada data</div>
         </div>
     </div>
 
@@ -209,6 +249,7 @@ const tabs=[
     {id:'informations',label:'Jenis Informasi',icon:'fas fa-database'},
     {id:'standards',label:'Standar Pelayanan',icon:'fas fa-clipboard-list'},
     {id:'regulations',label:'Regulasi',icon:'fas fa-gavel'},
+    {id:'annualReports',label:'Laporan Tahunan',icon:'fas fa-file-alt'},
     {id:'externalLinks',label:'Link Eksternal',icon:'fas fa-external-link-alt'},
     {id:'permohonan',label:'Permohonan',icon:'fas fa-paper-plane'},
 ];
@@ -217,13 +258,15 @@ const profile=ref(null);
 const profileForm=reactive({title:'',about:'',visi:'',misi:'',tupoksi:'',kontak:'',profil_pejabat:'',profil_sdm:'',struktur_image:null,existingImage:null});
 const allInformations=ref([]);const editInfoId=ref(null);const infoForm=reactive({category:'informasi',title:'',description:'',link:'',file:null,status:1});
 const allStandards=ref([]);const editStdId=ref(null);const stdForm=reactive({title:'',content:'',file:null,existingFile:null,status:1});
-const allRegulations=ref([]);const editRegId=ref(null);const regForm=reactive({title:'',nomor:'',description:'',link:'',file:null,tanggal:'',status:1});
+const allRegulations=ref([]);const editRegId=ref(null);const regForm=reactive({title:'',nomor:'',pembuat:'',description:'',link:'',file:null,tanggal:'',status:1});
 
 const berandaForm=reactive({beranda_image:null,beranda_title:'',beranda_description:'',existingImage:null});
 const navItems=ref([]);
 const navForm=reactive({title:'',link:''});
 const externalLinks=ref([]);const editExtId=ref(null);const extForm=reactive({title:'',link:'',image:null,existingImage:null,status:1});
+const annualReports=ref([]);const editArId=ref(null);const arForm=reactive({title:'',description:'',file:null,existingFile:null,link:'',status:1});
 const permohonanForm=reactive({permohonan_link:'',permohonan_email:'',permohonan_phone:''});
+const regulasiProfilForm=reactive({regulasi_profil:''});
 
 const BASE='/ppid';
 
@@ -238,17 +281,23 @@ async function loadAll(){
         const parsed=JSON.parse(p.data.navigations||'[]');
         navItems.value=Array.isArray(parsed)?parsed.map(n=>({...n,_id:n._id||genId()})):[];
         Object.assign(permohonanForm,{permohonan_link:p.data.permohonan_link||'',permohonan_email:p.data.permohonan_email||'',permohonan_phone:p.data.permohonan_phone||''});
+        regulasiProfilForm.regulasi_profil=p.data.regulasi_profil||'';
         allInformations.value=i.data.filter(x=>x.category==='informasi');allStandards.value=s.data;allRegulations.value=r.data;
     }catch(e){console.error(e);}
     try{
         const el=await api.get(BASE+'/external-links');
         externalLinks.value=el.data;
     }catch(e){console.error(e);}
+    try{
+        const ar=await api.get(BASE+'/annual-reports');
+        annualReports.value=ar.data;
+    }catch(e){console.error(e);}
 }
 
 async function saveProfile(){
     const fd=new FormData();
-    Object.entries(profileForm).forEach(([k,v])=>{if(v!==null&&k!=='existingImage')fd.append(k,v);});
+    const profileKeys=['title','about','visi','misi','tupoksi','kontak','profil_pejabat','profil_sdm','struktur_image','navigations'];
+    profileKeys.forEach(k=>{if(profileForm[k]!==null&&profileForm[k]!==undefined)fd.append(k,profileForm[k]);});
     try{await api.post(BASE+'/profile',fd,{headers:{'Content-Type':'multipart/form-data'}});swalSuccess('Profil disimpan!');loadAll();}catch(e){swalError('Gagal');}
 }
 
@@ -302,10 +351,10 @@ async function saveStd(){
 }
 async function deleteStd(id){if(!await swalConfirm('Hapus?'))return;try{await api.delete(`${BASE}/standards/${id}`);swalSuccess('Dihapus!');loadAll();}catch(e){swalError('Gagal');}}
 
-function editReg(item){editRegId.value=item.id;Object.assign(regForm,{title:item.title,nomor:item.nomor||'',description:item.description||'',link:item.link||'',file:null,tanggal:item.tanggal?.substring(0,10)||'',status:item.status});}
+function editReg(item){editRegId.value=item.id;Object.assign(regForm,{title:item.title,nomor:item.nomor||'',pembuat:item.pembuat||'',description:item.description||'',link:item.link||'',file:null,tanggal:item.tanggal?.substring(0,10)||'',status:item.status});}
 async function saveReg(){
     const fd=new FormData();Object.entries(regForm).forEach(([k,v])=>{if(v!==null)fd.append(k,v);});
-    try{if(editRegId.value)await api.post(`${BASE}/regulations/${editRegId.value}`,fd,{headers:{'Content-Type':'multipart/form-data'}});else await api.post(`${BASE}/regulations`,fd,{headers:{'Content-Type':'multipart/form-data'}});swalSuccess('Tersimpan!');editRegId.value=null;regForm.title='';regForm.nomor='';regForm.description='';regForm.link='';regForm.file=null;regForm.tanggal='';regForm.status=1;loadAll();}catch(e){swalError('Gagal');}
+    try{if(editRegId.value){fd.append('_method','PUT');await api.post(`${BASE}/regulations/${editRegId.value}`,fd,{headers:{'Content-Type':'multipart/form-data'}});}else await api.post(`${BASE}/regulations`,fd,{headers:{'Content-Type':'multipart/form-data'}});swalSuccess('Tersimpan!');editRegId.value=null;regForm.title='';regForm.nomor='';regForm.pembuat='';regForm.description='';regForm.link='';regForm.file=null;regForm.tanggal='';regForm.status=1;loadAll();}catch(e){swalError('Gagal');}
 }
 async function deleteReg(id){if(!await swalConfirm('Hapus?'))return;try{await api.delete(`${BASE}/regulations/${id}`);swalSuccess('Dihapus!');loadAll();}catch(e){swalError('Gagal');}}
 
@@ -314,7 +363,7 @@ function handleExtImageDrop(e){const f=e.dataTransfer.files[0];if(f&&f.type.star
 function editExternalLink(item){editExtId.value=item.id;Object.assign(extForm,{title:item.title,link:item.link,image:null,existingImage:item.image||null,status:item.status});}
 async function saveExternalLink(){
     const fd=new FormData();
-    fd.append('title',extForm.title);fd.append('link',extForm.link);
+    fd.append('title',extForm.title);fd.append('link',extForm.link);fd.append('status',String(extForm.status));
     if(extForm.image)fd.append('image',extForm.image);
     if(editExtId.value){
         fd.append('_method','PUT');
@@ -345,6 +394,21 @@ async function savePermohonan(){
     fd.append('permohonan_phone',permohonanForm.permohonan_phone);
     try{await api.post(BASE+'/profile',fd,{headers:{'Content-Type':'multipart/form-data'}});swalSuccess('Pengaturan permohonan disimpan!');loadAll();}catch(e){swalError('Gagal');}
 }
+
+async function saveRegulasiProfil(){
+    const fd=new FormData();
+    fd.append('regulasi_profil',regulasiProfilForm.regulasi_profil||'');
+    try{await api.post(BASE+'/profile',fd,{headers:{'Content-Type':'multipart/form-data'}});swalSuccess('Profil regulasi disimpan!');loadAll();}catch(e){swalError('Gagal');}
+}
+
+function resetArForm(){editArId.value=null;arForm.title='';arForm.description='';arForm.file=null;arForm.existingFile=null;arForm.link='';arForm.status=1;}
+function editAr(item){editArId.value=item.id;Object.assign(arForm,{title:item.title,description:item.description||'',file:null,existingFile:item.file||null,link:item.link||'',status:item.status});}
+async function saveAr(){
+    const fd=new FormData();fd.append('title',arForm.title);fd.append('description',arForm.description);fd.append('status',String(arForm.status));fd.append('link',arForm.link);
+    if(arForm.file)fd.append('file',arForm.file);
+    try{if(editArId.value){fd.append('_method','PUT');await api.post(`${BASE}/annual-reports/${editArId.value}`,fd,{headers:{'Content-Type':'multipart/form-data'}});}else await api.post(`${BASE}/annual-reports`,fd,{headers:{'Content-Type':'multipart/form-data'}});swalSuccess('Tersimpan!');resetArForm();loadAll();}catch(e){swalError('Gagal');}
+}
+async function deleteAr(id){if(!await swalConfirm('Hapus?'))return;try{await api.delete(`${BASE}/annual-reports/${id}`);swalSuccess('Dihapus!');loadAll();}catch(e){swalError('Gagal');}}
 
 onMounted(loadAll);
 </script>
