@@ -2,6 +2,8 @@
 
 const routes = [
     { path: '/', name: 'home', component: () => import('@/pages/HomePage.vue') },
+    { path: '/layanan', name: 'layanan-list', component: () => import('@/pages/LayananPage.vue') },
+    { path: '/survey-kepuasan-pelanggan', name: 'survey', component: () => import('@/pages/SurveyPage.vue') },
     { path: '/post/:jenis', name: 'post-list', component: () => import('@/pages/PostList.vue') },
     { path: '/post/:jenis/:id/:slug?', name: 'post-detail', component: () => import('@/pages/PostDetail.vue') },
     { path: '/layanan/:id/:slug?', name: 'layanan-detail', component: () => import('@/pages/LayananDetail.vue') },

@@ -1,0 +1,1 @@
+let t=null;function o(){return t||(t=new Promise((n,e)=>{if(window.Chart)return n(window.Chart);const r=document.createElement("script");r.src="/vendor/chartjs/chart.umd.js",r.onload=()=>n(window.Chart),r.onerror=()=>e(new Error("Failed to load Chart.js")),document.head.appendChild(r)}),t)}export{o as l};

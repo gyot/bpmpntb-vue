@@ -127,6 +127,7 @@
 <script setup>
 import { ref, reactive, computed, watch, onMounted, nextTick } from 'vue';
 import api from '@/bootstrap.js';
+import { loadChart } from '@/composables/useChart.js';
 
 const currentYear = new Date().getFullYear();
 const selectedYear = ref(currentYear);
@@ -219,6 +220,7 @@ onMounted(() => fetchStats());
 async function fetchStats() {
     destroyAllCharts();
     try {
+        await loadChart();
         const { data } = await api.get('/dashboard-stats', { params: { year: selectedYear.value } });
         stats.value = data;
         await nextTick();

@@ -243,6 +243,7 @@ import { ref, reactive, computed, watch, onMounted, nextTick } from 'vue';
 import { useRoute } from 'vue-router';
 import api from '@/bootstrap.js';
 import { swalConfirm, swalError, swalSuccess, swalWarning } from '@/swal.js';
+import { loadQuill } from '@/composables/useQuill.js';
 
 const route = useRoute();
 const jenis = ref(route.params.jenis);
@@ -323,6 +324,7 @@ async function openModal(item = null) {
     }
     modalOpen.value = true;
     await nextTick();
+    await loadQuill();
     setTimeout(initModalQuill, 150);
 }
 

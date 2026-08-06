@@ -281,6 +281,7 @@
 import { ref, onMounted, computed, nextTick } from 'vue';
 import api from '@/bootstrap.js';
 import { swalConfirm, swalError, swalSuccess } from '@/swal.js';
+import { loadChart } from '@/composables/useChart.js';
 
 const d = ref({
     today: 0, today_unique_users: 0, today_ai_calls: 0, today_keyword: 0,
@@ -360,6 +361,7 @@ function renderDailyChart() {
 async function loadAnalytics() {
     loading.value = true;
     try {
+        await loadChart();
         const [anRes, repRes] = await Promise.all([api.get('/chatbot/admin/analytics'), api.get('/chatbot/admin/analytics/report')]);
         d.value = { ...d.value, ...anRes.data };
         reportData.value = repRes.data.daily || [];

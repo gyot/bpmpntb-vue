@@ -7,6 +7,7 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount, watch, nextTick } from 'vue';
 import api from '@/bootstrap.js';
+import { loadQuill } from '@/composables/useQuill.js';
 
 const props = defineProps({ modelValue: { type: String, default: '' }, placeholder: { type: String, default: 'Tulis konten di sini...' } });
 const emit = defineEmits(['update:modelValue']);
@@ -171,7 +172,10 @@ watch(() => props.modelValue, (val) => {
     }
 });
 
-onMounted(() => setTimeout(initQuill, 150));
+onMounted(async () => {
+    await loadQuill();
+    setTimeout(initQuill, 150);
+});
 onBeforeUnmount(() => { hideOverlay(); if (mousedownHandler) { document.removeEventListener('mousedown', mousedownHandler); mousedownHandler = null; } quill = null; });
 
 defineExpose({ getQuill: () => quill });

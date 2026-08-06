@@ -107,6 +107,7 @@
 import { ref, reactive, onMounted, nextTick, onBeforeUnmount } from 'vue';
 import api from '@/bootstrap.js';
 import { swalConfirm, swalError, swalSuccess, swalWarning } from '@/swal.js';
+import { loadQuill } from '@/composables/useQuill.js';
 
 const items = ref([]); const editId = ref(null); const saving = ref(false); const showForm = ref(false);
 const imgInput = ref(null); const imagePreview = ref(null); const posPreview = ref(null); const editorRef = ref(null); const editorWrap = ref(null);
@@ -117,7 +118,7 @@ const form = reactive({ title:'', link_type:'post', link_url:'', content:'', pos
 
 async function load(){ try{const{data}=await api.get('/layanans');items.value=data;}catch(e){} }
 
-function openForm(item=null){
+async function openForm(item=null){
     showForm.value=true;
     if(item){
         editId.value=item.id;form.title=item.title;form.link_type=item.link_type;form.link_url=item.link_url||'';
@@ -126,6 +127,7 @@ function openForm(item=null){
     }else{
         editId.value=null;form.title='';form.link_type='post';form.link_url='';form.content='';form.pos_file=null;form.tags='';form.writer='';form.tanggal='';form.status=1;form.image=null;imagePreview.value=null;posPreview.value=null;
     }
+    await loadQuill();
     nextTick(()=>setTimeout(initEditor,200));
 }
 

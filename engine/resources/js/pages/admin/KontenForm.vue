@@ -135,6 +135,7 @@ import { ref, reactive, computed, onMounted, onBeforeUnmount, nextTick } from 'v
 import { useRoute, useRouter } from 'vue-router';
 import api from '@/bootstrap.js';
 import { swalWarning } from '@/swal.js';
+import { loadQuill } from '@/composables/useQuill.js';
 
 const route = useRoute();
 const router = useRouter();
@@ -494,6 +495,7 @@ async function save() {
 onMounted(async () => {
     await loadKategori();
     await loadPost();
+    await loadQuill();
     setTimeout(initQuill, 200);
 });
 
