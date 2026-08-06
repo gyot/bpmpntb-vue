@@ -113,7 +113,7 @@ const filteredUsers=computed(()=>{
 
 async function load(){
     loading.value=true;
-    try{const{data}=await api.get('/siamin/users');users.value=data;}catch(e){swalError('Gagal memuat data user SIAMIN');}
+    try{const{data}=await api.get('/siamin/users');console.log('SIAMIN users response:',JSON.stringify(data,null,2));users.value=data;}catch(e){console.error('SIAMIN users error:',e.response?.data||e.message);swalError('Gagal memuat data user SIAMIN');}
     loading.value=false;
 }
 
