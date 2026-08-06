@@ -156,8 +156,8 @@ class UserController extends Controller
 
     public function getMenuAccess(int $userId)
     {
-        $user = User::findOrFail($userId);
-        $rows = $user->menuAccess()->select('menu_key', 'sub_menu_key')->get();
+        $rows = DB::table('user_menu_access')->where('user_id', $userId)
+            ->select('menu_key', 'sub_menu_key')->get();
 
         $menus = [];
         $subMenus = [];
@@ -182,7 +182,6 @@ class UserController extends Controller
 
     public function updateMenuAccess(Request $request, int $userId)
     {
-        $user = User::findOrFail($userId);
         $validated = $request->validate([
             'menus' => 'required|array',
             'menus.*' => 'string|max:100',
