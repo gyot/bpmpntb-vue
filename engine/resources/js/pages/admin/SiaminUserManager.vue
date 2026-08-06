@@ -51,7 +51,7 @@
                         <td style="color:#94a3b8;font-weight:600;">{{ u.id_user }}</td>
                         <td class="fw-semibold" style="color:#0f172a;">{{ u.pegawai?.nama || u.name || '-' }}</td>
                         <td style="color:#64748b;">{{ u.email || u.user || '-' }}</td>
-                        <td style="color:#64748b;font-size:12px;">{{ u.pegawai?.nip || '-' }}</td>
+                        <td style="color:#64748b;font-size:12px;">{{ u.user || '-' }}</td>
                         <td><span class="um-badge um-badge-gray">{{ u.role }}</span></td>
                         <td><span class="um-badge" :class="u.status==='aktif'?'um-badge-green':'um-badge-red'">{{ u.status }}</span></td>
                         <td>
@@ -266,11 +266,13 @@ async function openMenuAccess(u){
     expandedMenus.value=new Set();
     try{
         const[menusRes,accessRes]=await Promise.all([api.get('/users/menus/list'),api.get(`/users/${u.id_user}/menu-access`)]);
+        console.log('Menu list:',JSON.stringify(menusRes.data,null,2));
+        console.log('Menu access:',JSON.stringify(accessRes.data,null,2));
         allMenus.value=menusRes.data.menus||menusRes.data;
         allSubMenus.value=menusRes.data.subMenus||{};
         selectedMenus.value=accessRes.data.menus||[];
         selectedSubMenus.value=accessRes.data.subMenus||{};
-    }catch(e){allMenus.value={};allSubMenus.value={};selectedMenus.value=[];selectedSubMenus.value={};}
+    }catch(e){console.error('Menu access error:',e.response?.data||e.message);allMenus.value={};allSubMenus.value={};selectedMenus.value=[];selectedSubMenus.value={};}
     showMenuModal.value=true;
 }
 
@@ -305,7 +307,7 @@ async function saveMenuAccess(){
 // ── CRUD ──
 async function load(){
     loading.value=true;
-    try{const{data}=await api.get('/siamin/users');users.value=data;}catch(e){swalError('Gagal memuat data user SIAMIN');}
+    try{const{data}=await api.get('/siamin/users');console.log('SIAMIN users:',JSON.stringify(data,null,2));users.value=data;}catch(e){console.error('SIAMIN error:',e.response?.data||e.message);swalError('Gagal memuat data user SIAMIN');}
     loading.value=false;
 }
 
