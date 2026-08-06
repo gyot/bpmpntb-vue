@@ -24,8 +24,8 @@
                 <tbody>
                     <tr v-for="u in filteredUsers" :key="u.id_user">
                         <td style="color:#94a3b8;font-weight:600;">{{ u.id_user }}</td>
-                        <td class="fw-semibold" style="color:#0f172a;">{{ u.pegawai?.nama || '-' }}</td>
-                        <td style="color:#64748b;">{{ u.email }}</td>
+                        <td class="fw-semibold" style="color:#0f172a;">{{ u.pegawai?.nama || u.email || '-' }}</td>
+                        <td style="color:#64748b;">{{ u.email || '-' }}</td>
                         <td style="color:#64748b;font-size:12px;">{{ u.pegawai?.nip || '-' }}</td>
                         <td><span class="um-badge um-badge-gray">{{ u.role }}</span></td>
                         <td><span class="um-badge" :class="u.status==='aktif'?'um-badge-green':'um-badge-red'">{{ u.status }}</span></td>
