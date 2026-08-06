@@ -110,7 +110,7 @@ class AuthController extends Controller
         }
 
         $siaminUsers = $result['data'];
-        $localRoles = UserRole::whereIn('id_user', collect($siaminUsers)->pluck('id_user'))->keyBy('id_user');
+        $localRoles = UserRole::whereIn('id_user', collect($siaminUsers)->pluck('id_user'))->get()->keyBy('id_user');
 
         $merged = collect($siaminUsers)->map(function ($u) use ($localRoles) {
             $local = $localRoles->get($u['id_user']);
