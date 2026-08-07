@@ -21,34 +21,54 @@ Route::post('/logout', [AuthController::class, 'logout'])->middleware('siamin.au
 Route::middleware('siamin.auth')->group(function () {
     Route::get('/user', [AuthController::class, 'user']);
     Route::get('/my-menu-access', [UserController::class, 'myMenuAccess']);
-    Route::get('/posts/{jenis}', [PostController::class, 'index']);
-    Route::post('/quil-upload-image', [PostController::class, 'uploadImage']);
-    Route::get('/kategori/{jenis}', [PostController::class, 'kategoriIndex']);
 });
 
-Route::middleware(['siamin.auth', 'siamin.admin'])->group(function () {
+Route::middleware(['siamin.auth', 'menu.access:dashboard'])->group(function () {
     Route::get('/dashboard-stats', [PostController::class, 'dashboardStats']);
+});
+
+Route::middleware(['siamin.auth', 'menu.access:konten,{jenis}'])->group(function () {
+    Route::get('/posts/{jenis}', [PostController::class, 'index']);
+    Route::post('/posts/{jenis}', [PostController::class, 'store']);
+    Route::put('/posts/{jenis}/{id}', [PostController::class, 'update']);
+    Route::delete('/posts/{jenis}/{id}', [PostController::class, 'destroy']);
+});
+
+Route::post('/quil-upload-image', [PostController::class, 'uploadImage'])
+    ->middleware(['siamin.auth', 'menu.access:konten|media:layanan']);
+
+Route::get('/kategori/{jenis}', [PostController::class, 'kategoriIndex'])
+    ->middleware(['siamin.auth', 'menu.access:kategori|konten,{jenis}']);
+
+Route::middleware(['siamin.auth', 'menu.access:kategori,{jenis}'])->group(function () {
+    Route::post('/kategori/{jenis}', [PostController::class, 'kategoriStore']);
+    Route::put('/kategori/{jenis}/{id}', [PostController::class, 'kategoriUpdate']);
+    Route::delete('/kategori/{jenis}/{id}', [PostController::class, 'kategoriDestroy']);
+});
+
+Route::middleware(['siamin.auth', 'menu.access:media,sliders'])->group(function () {
     Route::apiResource('sliders', SliderController::class)->except(['show']);
     Route::post('/sliders/reorder', [SliderController::class, 'reorder']);
-    Route::get('/settings-admin', [SettingController::class, 'index']);
-    Route::post('/settings-admin', [SettingController::class, 'update']);
-    Route::apiResource('users', UserController::class)->except(['show']);
-    Route::get('/users/{id}/menu-access', [UserController::class, 'getMenuAccess']);
-    Route::put('/users/{id}/menu-access', [UserController::class, 'updateMenuAccess']);
-    Route::get('/users/menus/list', [UserController::class, 'menus']);
+});
+
+Route::middleware(['siamin.auth', 'menu.access:media,link_eksternal'])->group(function () {
     Route::apiResource('external-links', ExternalLinkController::class)->except(['show']);
+});
+
+Route::middleware(['siamin.auth', 'menu.access:media,layanan'])->group(function () {
     Route::get('/layanans', [LayananController::class, 'index']);
     Route::post('/layanans', [LayananController::class, 'store']);
     Route::put('/layanans/{id}', [LayananController::class, 'update']);
     Route::delete('/layanans/{id}', [LayananController::class, 'destroy']);
     Route::post('/layanans/reorder', [LayananController::class, 'reorder']);
-    Route::post('/posts/{jenis}', [PostController::class, 'store']);
-    Route::put('/posts/{jenis}/{id}', [PostController::class, 'update']);
-    Route::delete('/posts/{jenis}/{id}', [PostController::class, 'destroy']);
-    Route::post('/kategori/{jenis}', [PostController::class, 'kategoriStore']);
-    Route::put('/kategori/{jenis}/{id}', [PostController::class, 'kategoriUpdate']);
-    Route::delete('/kategori/{jenis}/{id}', [PostController::class, 'kategoriDestroy']);
-    // PPID Admin
+});
+
+Route::middleware(['siamin.auth', 'menu.access:pengaturan'])->group(function () {
+    Route::get('/settings-admin', [SettingController::class, 'index']);
+    Route::post('/settings-admin', [SettingController::class, 'update']);
+});
+
+Route::middleware(['siamin.auth', 'menu.access:ppid,kelola_ppid'])->group(function () {
     Route::get('/ppid/profile', [PpidController::class, 'profileIndex']);
     Route::post('/ppid/profile', [PpidController::class, 'profileUpdate']);
     Route::get('/ppid/informations', [PpidController::class, 'informationIndex']);
@@ -72,27 +92,45 @@ Route::middleware(['siamin.auth', 'siamin.admin'])->group(function () {
     Route::post('/ppid/annual-reports', [PpidController::class, 'annualReportStore']);
     Route::put('/ppid/annual-reports/{id}', [PpidController::class, 'annualReportUpdate']);
     Route::delete('/ppid/annual-reports/{id}', [PpidController::class, 'annualReportDestroy']);
+});
 
+Route::middleware(['siamin.auth', 'menu.access:chatbot,chatbot_dashboard'])->group(function () {
     Route::get('/chatbot-responses', [ChatbotController::class, 'keywordIndex']);
     Route::post('/chatbot-responses', [ChatbotController::class, 'keywordStore']);
     Route::put('/chatbot-responses/{id}', [ChatbotController::class, 'keywordUpdate']);
     Route::delete('/chatbot-responses/{id}', [ChatbotController::class, 'keywordDestroy']);
+});
+
+Route::middleware(['siamin.auth', 'menu.access:chatbot,intent'])->group(function () {
     Route::get('/chatbot-intents', [ChatbotController::class, 'intentIndex']);
     Route::post('/chatbot-intents', [ChatbotController::class, 'intentStore']);
     Route::put('/chatbot-intents/{id}', [ChatbotController::class, 'intentUpdate']);
     Route::delete('/chatbot-intents/{id}', [ChatbotController::class, 'intentDestroy']);
+});
+
+Route::middleware(['siamin.auth', 'menu.access:chatbot,konfigurasi_ai'])->group(function () {
     Route::get('/ai-configs', [ChatbotController::class, 'aiConfigIndex']);
     Route::post('/ai-configs', [ChatbotController::class, 'aiConfigStore']);
     Route::put('/ai-configs/{id}', [ChatbotController::class, 'aiConfigUpdate']);
     Route::delete('/ai-configs/{id}', [ChatbotController::class, 'aiConfigDestroy']);
     Route::post('/ai-configs/{id}/test', [ChatbotController::class, 'aiConfigTest']);
-    Route::get('/chatbot-analytics', [ChatbotController::class, 'analytics']);
+});
 
-    // WhatsApp Broadcast
+Route::get('/chatbot-analytics', [ChatbotController::class, 'analytics'])
+    ->middleware(['siamin.auth', 'menu.access:chatbot,analytics']);
+
+Route::middleware(['siamin.auth', 'menu.access:broadcast,wa_broadcast'])->group(function () {
     Route::post('/wa-broadcast/send', [ChatbotController::class, 'broadcastSend']);
     Route::post('/wa-broadcast/send-stream', [ChatbotController::class, 'broadcastSendStream']);
     Route::get('/wa-broadcast/users', [ChatbotController::class, 'broadcastUsers']);
     Route::get('/wa-broadcast/history', [ChatbotController::class, 'broadcastHistory']);
+});
+
+Route::middleware(['siamin.auth', 'siamin.admin'])->group(function () {
+    Route::apiResource('users', UserController::class)->except(['show']);
+    Route::get('/users/{id}/menu-access', [UserController::class, 'getMenuAccess']);
+    Route::put('/users/{id}/menu-access', [UserController::class, 'updateMenuAccess']);
+    Route::get('/users/menus/list', [UserController::class, 'menus']);
 
     // Export/Import
     Route::get('/export-import/types', [ExportImportController::class, 'types']);

@@ -215,7 +215,7 @@ onMounted(async () => {
         allowedMenus.value = data.menus || data || [];
         allowedSubMenus.value = data.subMenus || {};
     } catch (e) {
-        allowedMenus.value = ['dashboard','konten','kategori','media','chatbot','broadcast','ppid','pengaturan'];
+        allowedMenus.value = [];
         allowedSubMenus.value = {};
     }
 });

@@ -51,8 +51,8 @@ Route::prefix('api/chatbot')->group(function () {
     Route::post('/typing', [ChatbotController::class, 'sendTyping']);
 });
 
-// Chatbot admin (auth required, session-based for livechat)
-Route::middleware(['auth:sanctum', 'admin'])->prefix('api/chatbot/admin')->group(function () {
+// Chatbot admin uses the same SIAMIN session and menu permissions as the CMS.
+Route::middleware(['siamin.auth', 'menu.access:chatbot,livechat'])->prefix('api/chatbot/admin')->group(function () {
     Route::get('/dashboard', [ChatbotController::class, 'adminLiveDashboard']);
     Route::post('/ping', [ChatbotController::class, 'adminPing']);
     Route::post('/toggle-online', [ChatbotController::class, 'adminToggleOnline']);
@@ -66,22 +66,19 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('api/chatbot/admin')->group
     Route::get('/settings', [ChatbotController::class, 'adminGetSettings']);
     Route::post('/settings', [ChatbotController::class, 'adminUpdateSettings']);
     Route::post('/typing', [ChatbotController::class, 'adminTyping']);
-    Route::get('/analytics', [ChatbotController::class, 'adminAnalytics']);
-    Route::get('/analytics-page', [ChatbotController::class, 'adminAnalyticsPage']);
-    Route::get('/analytics/report', [ChatbotController::class, 'adminAnalyticsReport']);
-    Route::get('/analytics/pdf', [ChatbotController::class, 'adminAnalyticsPdf']);
-    Route::post('/analytics/user-usage/{userId}/reset-quota', [ChatbotController::class, 'resetUserTokenQuota']);
     Route::get('/unread', [ChatbotController::class, 'adminUnreadSessions']);
     Route::post('/mark-read', [ChatbotController::class, 'adminMarkRead']);
+});
 
-    // Intent
+Route::middleware(['siamin.auth', 'menu.access:chatbot,intent'])->prefix('api/chatbot/admin')->group(function () {
     Route::get('/intent', [IntentController::class, 'index']);
     Route::post('/intent', [IntentController::class, 'store']);
     Route::get('/intent/{id}/edit', [IntentController::class, 'edit']);
     Route::put('/intent/{id}', [IntentController::class, 'update']);
     Route::delete('/intent/{id}', [IntentController::class, 'destroy']);
+});
 
-    // Knowledge Base RAG
+Route::middleware(['siamin.auth', 'menu.access:chatbot,knowledge_base'])->prefix('api/chatbot/admin')->group(function () {
     Route::get('/knowledge-base', [KnowledgeBaseController::class, 'indexCategories']);
     Route::get('/knowledge-base/categories', [KnowledgeBaseController::class, 'getCategories']);
     Route::post('/knowledge-base/categories', [KnowledgeBaseController::class, 'storeCategory']);
@@ -98,8 +95,9 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('api/chatbot/admin')->group
     Route::get('/knowledge-base/stats', [KnowledgeBaseController::class, 'stats']);
     Route::post('/knowledge-base/regenerate-embeddings', [KnowledgeBaseController::class, 'regenerateEmbeddings']);
     Route::post('/knowledge-base/regenerate-document/{id}', [KnowledgeBaseController::class, 'regenerateDocument']);
+});
 
-    // AI Settings
+Route::middleware(['siamin.auth', 'menu.access:chatbot,konfigurasi_ai'])->prefix('api/chatbot/admin')->group(function () {
     Route::get('/ai-settings', [AiSettingsController::class, 'index']);
     Route::post('/ai-settings', [AiSettingsController::class, 'store']);
     Route::get('/ai-settings/current', [AiSettingsController::class, 'current']);
@@ -109,10 +107,19 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('api/chatbot/admin')->group
     Route::post('/ai-settings/{id}/activate', [AiSettingsController::class, 'activate']);
     Route::post('/ai-settings/test', [AiSettingsController::class, 'test']);
     Route::post('/ai-settings/test-embedding', [AiSettingsController::class, 'testEmbedding']);
+});
 
-    // WhatsApp Gateway Settings
+Route::middleware(['siamin.auth', 'menu.access:chatbot,whatsapp'])->prefix('api/chatbot/admin')->group(function () {
     Route::get('/whatsapp-settings', [ChatbotController::class, 'whatsappSettings']);
     Route::post('/whatsapp-settings', [ChatbotController::class, 'whatsappSettingsUpdate']);
+});
+
+Route::middleware(['siamin.auth', 'menu.access:chatbot,analytics'])->prefix('api/chatbot/admin')->group(function () {
+    Route::get('/analytics', [ChatbotController::class, 'adminAnalytics']);
+    Route::get('/analytics-page', [ChatbotController::class, 'adminAnalyticsPage']);
+    Route::get('/analytics/report', [ChatbotController::class, 'adminAnalyticsReport']);
+    Route::get('/analytics/pdf', [ChatbotController::class, 'adminAnalyticsPdf']);
+    Route::post('/analytics/user-usage/{userId}/reset-quota', [ChatbotController::class, 'resetUserTokenQuota']);
 });
 
 Route::get('/{any?}', function () {

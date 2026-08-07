@@ -50,5 +50,6 @@ class Kernel extends HttpKernel
         'admin' => \App\Http\Middleware\AdminOnly::class,
         'siamin.auth' => \App\Http\Middleware\SiaminAuth::class,
         'siamin.admin' => \App\Http\Middleware\SiaminAdmin::class,
+        'menu.access' => \App\Http\Middleware\MenuAccess::class,
     ];
 }
