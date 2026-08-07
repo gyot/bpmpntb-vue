@@ -43,7 +43,7 @@
         @apply antialiased;
         background: var(--color-background);
         color: var(--color-text-primary);
-        font-family: 'Inter', 'Quicksand', system-ui, -apple-system, sans-serif;
+        font-family: 'Quicksand', system-ui, -apple-system, 'Segoe UI', sans-serif;
         font-weight: 400;
         line-height: var(--a11y-line-height, 1.7);
         -webkit-font-smoothing: antialiased;

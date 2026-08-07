@@ -34,10 +34,6 @@
     <link rel="apple-touch-icon" href="/pwa/icon-192.svg">
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" onload="this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"></noscript>
     <link rel="preload" as="style" href="/vendor/fontawesome/css/all.min.css" onload="this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css"></noscript>
     <link rel="stylesheet" href="/fonts/quicksand/quicksand.css">
@@ -67,7 +63,7 @@
     </script>
 
     <style>
-        body{font-family:'Inter','Quicksand',system-ui,sans-serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;margin:0;overflow-x:hidden}
+        body{font-family:'Quicksand',system-ui,-apple-system,'Segoe UI',sans-serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;margin:0;overflow-x:hidden}
         #app-loader{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;background:linear-gradient(135deg,#0A1628 0%,#0D1F35 100%);z-index:9999;transition:opacity .5s ease}
         #app-loader.fade-out{opacity:0;pointer-events:none}
         #app-loader .loader-logo{width:72px;height:72px;object-fit:contain;animation:pulse 2.5s ease-in-out infinite;filter:brightness(0) invert(1);opacity:0.9}
