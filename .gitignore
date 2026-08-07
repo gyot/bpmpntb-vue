@@ -1,5 +1,6 @@
 /.phpunit.cache
 /engine/node_modules
+/hot
 
 # Environment
 .env
