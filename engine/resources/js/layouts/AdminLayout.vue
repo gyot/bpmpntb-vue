@@ -184,7 +184,7 @@ const filteredMenuGroups = computed(() => {
         };
     }).filter(group => group.items.length);
 });
-const userName = computed(() => user.value?.nama || user.value?.name || user.value?.pegawai?.nama || user.value?.email || user.name || 'Admin');
+const userName = computed(() => user.name || user.value?.nama || user.value?.name || user.value?.pegawai?.nama || user.value?.email || user.name || 'Admin');
 const userNip = computed(() => user.value?.nip || user.value?.pegawai?.nip || user.user ||'');
 const nipLabel = computed(() => userNip.value ? `NIP ${userNip.value}` : 'NIP belum tersedia');
 const userInitial = computed(() => userName.value.trim().charAt(0).toUpperCase());
