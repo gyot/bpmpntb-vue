@@ -266,13 +266,11 @@ async function openMenuAccess(u){
     expandedMenus.value=new Set();
     try{
         const[menusRes,accessRes]=await Promise.all([api.get('/users/menus/list'),api.get(`/users/${u.id_user}/menu-access`)]);
-        console.log('Menu list:',JSON.stringify(menusRes.data,null,2));
-        console.log('Menu access:',JSON.stringify(accessRes.data,null,2));
         allMenus.value=menusRes.data.menus||menusRes.data;
         allSubMenus.value=menusRes.data.subMenus||{};
         selectedMenus.value=accessRes.data.menus||[];
         selectedSubMenus.value=accessRes.data.subMenus||{};
-    }catch(e){console.error('Menu access error:',e.response?.data||e.message);allMenus.value={};allSubMenus.value={};selectedMenus.value=[];selectedSubMenus.value={};}
+    }catch(e){swalError(e.response?.data?.message||'Gagal memuat akses menu');allMenus.value={};allSubMenus.value={};selectedMenus.value=[];selectedSubMenus.value={};}
     showMenuModal.value=true;
 }
 
@@ -307,7 +305,7 @@ async function saveMenuAccess(){
 // ── CRUD ──
 async function load(){
     loading.value=true;
-    try{const{data}=await api.get('/siamin/users');console.log('SIAMIN users:',JSON.stringify(data,null,2));users.value=data;}catch(e){console.error('SIAMIN error:',e.response?.data||e.message);swalError('Gagal memuat data user SIAMIN');}
+    try{const{data}=await api.get('/siamin/users');users.value=data;}catch(e){swalError(e.response?.data?.message||'Gagal memuat data user SIAMIN');}
     loading.value=false;
 }
 

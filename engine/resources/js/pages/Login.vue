@@ -117,7 +117,10 @@ async function handleLogin() {
         localStorage.setItem('user', JSON.stringify(data.user));
         router.push('/admin');
     } catch (e) {
-        error.value = e.response?.data?.message || 'Login gagal';
+        const validationErrors = e.response?.data?.errors;
+        error.value = validationErrors
+            ? Object.values(validationErrors).flat()[0]
+            : e.response?.data?.message || 'Login gagal';
     }
     submitting.value = false;
 }

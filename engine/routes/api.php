@@ -20,6 +20,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->middleware('siamin.au
 
 Route::middleware('siamin.auth')->group(function () {
     Route::get('/user', [AuthController::class, 'user']);
+    Route::get('/my-menu-access', [UserController::class, 'myMenuAccess']);
     Route::get('/posts/{jenis}', [PostController::class, 'index']);
     Route::post('/quil-upload-image', [PostController::class, 'uploadImage']);
     Route::get('/kategori/{jenis}', [PostController::class, 'kategoriIndex']);
@@ -35,7 +36,6 @@ Route::middleware(['siamin.auth', 'siamin.admin'])->group(function () {
     Route::get('/users/{id}/menu-access', [UserController::class, 'getMenuAccess']);
     Route::put('/users/{id}/menu-access', [UserController::class, 'updateMenuAccess']);
     Route::get('/users/menus/list', [UserController::class, 'menus']);
-    Route::get('/my-menu-access', [UserController::class, 'myMenuAccess']);
     Route::apiResource('external-links', ExternalLinkController::class)->except(['show']);
     Route::get('/layanans', [LayananController::class, 'index']);
     Route::post('/layanans', [LayananController::class, 'store']);

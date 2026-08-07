@@ -190,7 +190,6 @@ class UserController extends Controller
             'subMenus.*.*' => 'string|max:100',
         ]);
 
-        DB::table('user_menu_access')->where('user_id', $userId)->delete();
         $rows = [];
         $now = now();
 
@@ -218,7 +217,13 @@ class UserController extends Controller
             }
         }
 
-        if ($rows) DB::table('user_menu_access')->insert($rows);
+        DB::transaction(function () use ($userId, $rows) {
+            DB::table('user_menu_access')->where('user_id', $userId)->delete();
+
+            if ($rows) {
+                DB::table('user_menu_access')->insert($rows);
+            }
+        });
 
         return response()->json([
             'message' => 'Akses menu berhasil diupdate',
