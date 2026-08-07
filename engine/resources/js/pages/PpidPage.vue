@@ -1,273 +1,151 @@
-﻿<template>
+<template>
     <PublicLayout>
-        <section class="py-16" style="background:linear-gradient(135deg,#f0f7ff,#e8f0fe)">
-            <div class="max-w-7xl mx-auto px-4">
-                <div class="grid md:grid-cols-2 gap-8 items-center">
-                    <div v-if="profile?.beranda_image" class="rounded-2xl overflow-hidden shadow-lg">
-                        <img :src="'/upload/ppid/'+profile.beranda_image" class="w-full h-full object-cover" alt="PPID BPMP NTB">
+        <section class="ppid-hero">
+            <div class="ppid-hero-grid"></div>
+            <div class="ppid-orb ppid-orb-a"></div><div class="ppid-orb ppid-orb-b"></div>
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+                <nav class="ppid-breadcrumb" aria-label="Breadcrumb"><router-link to="/">Beranda</router-link><i class="fas fa-chevron-right"></i><span>PPID</span></nav>
+                <div class="ppid-hero-layout">
+                    <div class="ppid-hero-copy">
+                        <span class="ppid-eyebrow"><i class="fas fa-shield-halved"></i>Pelayanan Informasi Publik</span>
+                        <h1>{{ profile?.beranda_title || 'PPID BPMP Provinsi NTB' }}</h1>
+                        <div v-if="profile?.beranda_description" class="ppid-description" v-html="profile.beranda_description"></div>
+                        <p v-else class="ppid-description">Pejabat Pengelola Informasi dan Dokumentasi yang melayani kebutuhan informasi publik secara transparan, cepat, dan akuntabel.</p>
+                        <div class="ppid-hero-actions">
+                            <button @click="setTab('permohonan')" class="ppid-primary-action"><i class="fas fa-paper-plane"></i>Ajukan Permohonan</button>
+                            <button @click="setTab('informasi')" class="ppid-secondary-action"><i class="fas fa-folder-open"></i>Lihat Informasi Publik</button>
+                        </div>
                     </div>
-                    <div :class="profile?.beranda_image ? '' : 'md:col-span-2 text-center'">
-                        <h1 class="text-4xl font-bold mb-3" style="color:var(--color-text-primary)">{{ profile?.beranda_title || 'PPID BPMP Provinsi NTB' }}</h1>
-                        <div v-if="profile?.beranda_description" class="text-lg prose max-w-none" style="color:var(--color-text-secondary)" v-html="profile.beranda_description"></div>
-                        <p v-else class="text-lg" style="color:var(--color-text-secondary)">Pejabat Pengelola Informasi dan Dokumentasi</p>
+                    <div class="ppid-visual">
+                        <img v-if="profile?.beranda_image" :src="'/upload/ppid/'+profile.beranda_image" alt="Pelayanan PPID BPMP Provinsi NTB" width="620" height="460" @error="$event.target.style.display='none'">
+                        <div v-else class="ppid-visual-placeholder"><i class="fas fa-building-columns"></i><span>PPID</span><small>BPMP Provinsi NTB</small></div>
+                        <div class="ppid-trust-card"><span><i class="fas fa-circle-check"></i></span><div><strong>Informasi Terpercaya</strong><small>Dikelola secara resmi dan akuntabel</small></div></div>
                     </div>
+                </div>
+                <div class="ppid-stats">
+                    <div><i class="fas fa-layer-group"></i><span><strong>{{ informationCount }}</strong><small>Informasi Publik</small></span></div>
+                    <div><i class="fas fa-clipboard-check"></i><span><strong>{{ standards.length }}</strong><small>Standar Pelayanan</small></span></div>
+                    <div><i class="fas fa-scale-balanced"></i><span><strong>{{ regulations.length }}</strong><small>Regulasi</small></span></div>
+                    <div><i class="fas fa-file-lines"></i><span><strong>{{ annualReports.length }}</strong><small>Laporan Tahunan</small></span></div>
                 </div>
             </div>
         </section>
 
-        <div class="max-w-7xl mx-auto px-4 py-8">
-            <div v-if="loading" class="text-center py-16"><i class="fas fa-spinner fa-spin text-3xl" style="color:var(--color-primary)"></i></div>
-
-            <div v-else>
-                <div class="flex flex-wrap gap-2 mb-8 border-b border-gray-200 pb-4">
-                    <button v-for="tab in tabs" :key="tab.id" @click="activeTab=tab.id"
-                        class="px-5 py-2.5 rounded-full text-sm font-semibold transition-all"
-                        :class="activeTab===tab.id ? 'text-white shadow-md' : 'bg-gray-100 hover:bg-gray-200'"
-                        :style="activeTab===tab.id ? {background:'var(--color-primary)'} : {color:'var(--color-text-secondary)'}">
-                        <i :class="tab.icon" class="mr-1.5"></i>{{ tab.label }}
-                    </button>
+        <section class="ppid-main">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div v-if="loading" class="ppid-loading">
+                    <div class="skeleton h-16 rounded-2xl mb-6"></div><div class="grid md:grid-cols-2 gap-6"><div class="skeleton h-72 rounded-3xl"></div><div class="skeleton h-72 rounded-3xl"></div></div>
                 </div>
+                <template v-else>
+                    <nav class="ppid-tabs" aria-label="Navigasi PPID">
+                        <button v-for="tab in tabs" :key="tab.id" @click="setTab(tab.id)" :class="{'active':activeTab===tab.id}" :aria-current="activeTab===tab.id?'page':undefined">
+                            <span><i :class="tab.icon"></i></span><small>{{ tab.short }}</small><strong>{{ tab.label }}</strong>
+                        </button>
+                    </nav>
 
-                <div v-if="activeTab==='profil'" class="card p-8 animate-fade-in">
-                    <h2 class="text-2xl font-bold mb-6" style="color:var(--color-text-primary)">{{ profile?.title || 'Profil PPID' }}</h2>
-                    <div v-if="profile?.about" class="mb-8"><div class="prose max-w-none" v-html="profile.about"></div></div>
-                    <div class="grid md:grid-cols-2 gap-8 mb-8">
-                        <div class="card p-6 border-t-4" style="border-color:var(--color-primary)">
-                            <h3 class="text-lg font-bold mb-3" style="color:var(--color-primary)">Visi</h3>
-                            <div class="prose max-w-none" v-html="profile?.visi || '-'"></div>
-                        </div>
-                        <div class="card p-6 border-t-4" style="border-color:var(--color-accent)">
-                            <h3 class="text-lg font-bold mb-3" style="color:var(--color-accent)">Misi</h3>
-                            <div class="prose max-w-none" v-html="profile?.misi || '-'"></div>
-                        </div>
-                    </div>
-                    <div v-if="profile?.tupoksi" class="mb-8">
-                        <h3 class="text-lg font-bold mb-3" style="color:var(--color-text-primary)">Tugas & Fungsi</h3>
-                        <div class="prose max-w-none" v-html="profile.tupoksi"></div>
-                    </div>
-                    <div v-if="profile?.struktur_image" class="mb-8 text-center">
-                        <h3 class="text-lg font-bold mb-3" style="color:var(--color-text-primary)">Struktur Organisasi</h3>
-                        <img :src="'/upload/ppid/'+profile.struktur_image" class="max-w-full mx-auto rounded-xl shadow">
-                    </div>
-                    <div v-if="profile?.kontak">
-                        <h3 class="text-lg font-bold mb-3" style="color:var(--color-text-primary)">Kontak</h3>
-                        <div class="prose max-w-none" v-html="profile.kontak"></div>
-                    </div>
-                </div>
-
-                <div v-if="activeTab==='pejabat'" class="card p-8 animate-fade-in">
-                    <h2 class="text-2xl font-bold mb-6" style="color:var(--color-text-primary)">Profil Pejabat</h2>
-                    <div v-if="profile?.profil_pejabat" class="prose max-w-none" v-html="profile.profil_pejabat"></div>
-                    <div v-else class="text-center py-12"><i class="fas fa-user-tie text-5xl text-gray-200 mb-4"></i><p style="color:var(--color-text-secondary)">Belum ada data profil pejabat.</p></div>
-                </div>
-
-                <div v-if="activeTab==='sdm'" class="card p-8 animate-fade-in">
-                    <h2 class="text-2xl font-bold mb-6" style="color:var(--color-text-primary)">Profil SDM / Pegawai</h2>
-                    <div v-if="profile?.profil_sdm" class="prose max-w-none" v-html="profile.profil_sdm"></div>
-                    <div v-else class="text-center py-12"><i class="fas fa-users text-5xl text-gray-200 mb-4"></i><p style="color:var(--color-text-secondary)">Belum ada data profil SDM.</p></div>
-                </div>
-
-                <div v-if="activeTab==='informasi'" class="animate-fade-in">
-                    <h2 class="text-2xl font-bold mb-6" style="color:var(--color-text-primary)">Jenis Informasi</h2>
-                    <div v-if="allInformations.length" class="grid md:grid-cols-2 gap-5">
-                        <div v-for="item in allInformations" :key="item.id" class="card p-6 hover:shadow-md transition">
-                            <h3 class="text-lg font-bold mb-3" style="color:var(--color-text-primary)">{{ item.title }}</h3>
-                            <div v-if="item.description" class="prose max-w-none text-sm" style="color:var(--color-text-secondary)" v-html="item.description"></div>
-                        </div>
-                    </div>
-                    <div v-else class="card p-12 text-center"><i class="fas fa-folder-open text-4xl text-gray-300 mb-3"></i><p style="color:var(--color-text-secondary)">Belum ada informasi</p></div>
-                </div>
-
-                <div v-if="activeTab==='standar'" class="animate-fade-in">
-                    <template v-if="!viewStd">
-                        <h2 class="text-2xl font-bold mb-6" style="color:var(--color-text-primary)">Standar Pelayanan</h2>
-                        <div v-if="standards.length" class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            <div v-for="item in standards" :key="item.id" @click="viewStd=item" class="card p-5 cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-all group">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style="background:color-mix(in srgb, var(--color-primary) 10%, transparent)"><i class="fas fa-clipboard-list" style="color:var(--color-primary)"></i></div>
-                                    <h3 class="font-bold group-hover:text-[var(--color-primary)] transition-colors" style="color:var(--color-text-primary)">{{ item.title }}</h3>
-                                </div>
+                    <div class="ppid-content">
+                        <section v-if="activeTab==='profil'" class="tab-panel">
+                            <header class="section-header"><div><span>Identitas PPID</span><h2>{{ profile?.title || 'Profil PPID' }}</h2><p>Mengenal peran, arah layanan, dan organisasi PPID BPMP Provinsi NTB.</p></div><div class="section-number">01</div></header>
+                            <div v-if="profile?.about" class="editorial-content intro-content" v-html="profile.about"></div>
+                            <div class="vision-grid">
+                                <article><span><i class="fas fa-eye"></i></span><small>Arah Layanan</small><h3>Visi</h3><div class="editorial-content" v-html="profile?.visi || '<p>Belum ada data visi.</p>'"></div></article>
+                                <article><span><i class="fas fa-bullseye"></i></span><small>Langkah Strategis</small><h3>Misi</h3><div class="editorial-content" v-html="profile?.misi || '<p>Belum ada data misi.</p>'"></div></article>
                             </div>
-                        </div>
-                        <div v-else class="card p-12 text-center"><i class="fas fa-clipboard-list text-4xl text-gray-300 mb-3"></i><p style="color:var(--color-text-secondary)">Belum ada standar pelayanan</p></div>
-                    </template>
-                    <template v-else>
-                        <button @click="viewStd=null" class="mb-4 btn-ghost border border-gray-200"><i class="fas fa-arrow-left mr-2"></i>Kembali</button>
-                        <div class="card p-8">
-                            <h2 class="text-2xl font-bold mb-6" style="color:var(--color-text-primary)">{{ viewStd.title }}</h2>
-                            <div v-if="viewStd.content" class="prose max-w-none mb-6" style="color:var(--color-text-primary)" v-html="viewStd.content"></div>
-                            <a v-if="viewStd.file" :href="'/upload/ppid/'+viewStd.file" target="_blank" class="btn-primary"><i class="fas fa-file-pdf mr-2"></i>Lihat POS</a>
-                        </div>
-                    </template>
-                </div>
+                            <article v-if="profile?.tupoksi" class="profile-feature"><div class="feature-icon"><i class="fas fa-diagram-project"></i></div><div><small>Mandat Organisasi</small><h3>Tugas dan Fungsi</h3><div class="editorial-content" v-html="profile.tupoksi"></div></div></article>
+                            <article v-if="profile?.struktur_image" class="structure-card"><header><span><i class="fas fa-sitemap"></i></span><div><small>Organisasi</small><h3>Struktur PPID</h3></div></header><img :src="'/upload/ppid/'+profile.struktur_image" alt="Struktur Organisasi PPID" loading="lazy"></article>
+                            <article v-if="profile?.kontak" class="contact-card"><div><small>Kanal Resmi</small><h3>Kontak PPID</h3><p>Hubungi kami untuk konsultasi kebutuhan informasi publik.</p></div><div class="editorial-content" v-html="profile.kontak"></div></article>
+                        </section>
 
-                <div v-if="activeTab==='regulasi'" class="animate-fade-in">
-                    <h2 class="text-2xl font-bold mb-6" style="color:var(--color-text-primary)">Regulasi</h2>
-                    <div v-if="profile?.regulasi_profil" class="card p-8 mb-6">
-                        <div class="prose max-w-none" v-html="profile.regulasi_profil"></div>
-                    </div>
-                    <div v-if="regulations.length" class="mb-4">
-                        <div class="relative">
-                            <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                            <input v-model="regSearch" type="text" placeholder="Cari regulasi..." class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition" style="font-family:inherit">
-                        </div>
-                    </div>
-                    <div v-if="filteredRegulations.length" class="space-y-4">
-                        <div v-for="item in filteredRegulations" :key="item.id" class="card p-6 hover:shadow-md transition">
-                            <h3 class="text-lg font-bold mb-2" style="color:var(--color-text-primary)">{{ item.title }}</h3>
-                            <div v-if="item.description" class="prose prose-sm max-w-none mb-4" style="color:var(--color-text-secondary)" v-html="item.description"></div>
-                            <div class="flex flex-wrap items-center gap-2">
-                                <span v-if="item.pembuat" class="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full" style="background:color-mix(in srgb, var(--color-primary) 10%, transparent);color:var(--color-primary)">
-                                    <i class="fas fa-building text-[10px]"></i>{{ item.pembuat }}
-                                </span>
-                                <span v-if="item.tanggal" class="inline-flex items-center gap-1.5 text-xs px-3 py-1 rounded-full bg-gray-100" style="color:var(--color-text-secondary)">
-                                    <i class="fas fa-calendar text-[10px]"></i>{{ getYear(item.tanggal) }}
-                                </span>
-                            </div>
-                            <div class="flex gap-2 mt-4">
-                                <a v-if="item.file" :href="'/upload/ppid/'+item.file" class="btn-ghost text-xs border border-gray-200 rounded-lg px-3 py-1.5" download><i class="fas fa-download mr-1"></i>Download</a>
-                                <a v-if="item.link" :href="item.link" target="_blank" class="btn-ghost text-xs border border-gray-200 rounded-lg px-3 py-1.5"><i class="fas fa-external-link-alt mr-1"></i>Link</a>
-                            </div>
-                        </div>
-                    </div>
-                    <div v-else-if="regSearch && regulations.length" class="card p-12 text-center">
-                        <i class="fas fa-search text-4xl text-gray-300 mb-3"></i>
-                        <p style="color:var(--color-text-secondary)">Tidak ada regulasi yang cocok dengan pencarian "<strong>{{ regSearch }}</strong>"</p>
-                    </div>
-                    <div v-else-if="!regulations.length" class="card p-12 text-center"><i class="fas fa-gavel text-4xl text-gray-300 mb-3"></i><p style="color:var(--color-text-secondary)">Belum ada regulasi</p></div>
-                </div>
+                        <section v-if="activeTab==='pejabat'" class="tab-panel">
+                            <header class="section-header"><div><span>Pengelola Informasi</span><h2>Profil Pejabat PPID</h2><p>Pejabat yang bertanggung jawab atas pelayanan informasi dan dokumentasi.</p></div><div class="section-number">02</div></header>
+                            <div v-if="profile?.profil_pejabat" class="content-surface editorial-content" v-html="profile.profil_pejabat"></div><EmptyState v-else icon="fas fa-user-tie" title="Profil pejabat belum tersedia" />
+                        </section>
 
-                <div v-if="activeTab==='laporan'" class="animate-fade-in">
-                    <h2 class="text-2xl font-bold mb-6" style="color:var(--color-text-primary)">Laporan Tahunan</h2>
-                    <div v-if="annualReports.length" class="grid md:grid-cols-2 gap-5">
-                        <div v-for="item in annualReports" :key="item.id" class="card p-6 hover:shadow-lg hover:-translate-y-1 transition-all">
-                            <div class="flex items-start gap-4">
-                                <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style="background:color-mix(in srgb, var(--color-primary) 10%, transparent)">
-                                    <i class="fas fa-file-alt text-xl" style="color:var(--color-primary)"></i>
-                                </div>
-                                <div class="flex-1 min-w-0">
-                                    <h3 class="font-bold mb-1" style="color:var(--color-text-primary)">{{ item.title }}</h3>
-                                    <div v-if="item.description" class="prose prose-sm max-w-none mb-4" style="color:var(--color-text-secondary)" v-html="item.description"></div>
-                                    <div class="flex flex-wrap gap-2 mt-3">
-                                        <a v-if="item.link" :href="item.link" target="_blank" class="inline-flex items-center gap-1.5 text-xs font-semibold px-4 py-2 rounded-lg text-white transition" style="background:var(--color-primary)"><i class="fas fa-eye"></i>Lihat</a>
-                                        <a v-if="item.file" :href="'/upload/ppid/'+item.file" class="inline-flex items-center gap-1.5 text-xs font-semibold px-4 py-2 rounded-lg border border-gray-200 transition hover:bg-gray-50" style="color:var(--color-text-primary)" download><i class="fas fa-download"></i>Unduh</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div v-else class="card p-12 text-center"><i class="fas fa-file-alt text-4xl text-gray-300 mb-3"></i><p style="color:var(--color-text-secondary)">Belum ada laporan tahunan</p></div>
-                </div>
+                        <section v-if="activeTab==='sdm'" class="tab-panel">
+                            <header class="section-header"><div><span>Sumber Daya Manusia</span><h2>Profil SDM PPID</h2><p>Tim yang mendukung pelaksanaan layanan informasi publik.</p></div><div class="section-number">03</div></header>
+                            <div v-if="profile?.profil_sdm" class="content-surface editorial-content" v-html="profile.profil_sdm"></div><EmptyState v-else icon="fas fa-users" title="Profil SDM belum tersedia" />
+                        </section>
 
-                <div v-if="activeTab==='maklumat'" class="animate-fade-in">
-                    <h2 class="text-2xl font-bold mb-6" style="color:var(--color-text-primary)">Maklumat Pelayanan</h2>
-                    <div class="card p-8 text-center border-t-4" style="border-color:var(--color-accent)">
-                        <div class="text-6xl mb-4">&#x1F4DC;</div>
-                        <blockquote class="text-xl italic font-medium leading-relaxed max-w-3xl mx-auto" style="color:var(--color-text-primary)">
-                            "Dengan ini, kami sanggup menyelenggarakan pelayanan sesuai standar pelayanan yang telah ditetapkan dan apabila tidak menepati janji ini, kami siap menerima sanksi sesuai peraturan perundang-undangan yang berlaku"
-                        </blockquote>
-                        <p class="mt-6 font-semibold" style="color:var(--color-text-secondary)">BPMP Provinsi Nusa Tenggara Barat</p>
-                    </div>
-                </div>
+                        <section v-if="activeTab==='informasi'" class="tab-panel">
+                            <header class="section-header"><div><span>Informasi Publik</span><h2>Daftar Informasi</h2><p>Temukan informasi yang tersedia untuk masyarakat.</p></div><div class="section-number">04</div></header>
+                            <div v-if="allInformations.length" class="document-grid">
+                                <article v-for="(doc,index) in allInformations" :key="doc.id" class="document-card">
+                                    <div class="document-top"><span>{{ String(index+1).padStart(2,'0') }}</span><i :class="documentIcon(doc)"></i></div><h3>{{ doc.title }}</h3><div v-if="doc.description" class="document-description" v-html="doc.description"></div>
+                                    <footer><a v-if="doc.file" :href="'/upload/ppid/'+doc.file" target="_blank" rel="noopener noreferrer"><i class="fas fa-file-arrow-down"></i>Unduh Dokumen</a><a v-if="doc.link" :href="doc.link" target="_blank" rel="noopener noreferrer"><i class="fas fa-arrow-up-right-from-square"></i>Buka Tautan</a><span v-if="!doc.file&&!doc.link">Informasi tersedia</span></footer>
+                                </article>
+                            </div><EmptyState v-else icon="fas fa-folder-open" title="Belum ada informasi publik" />
+                        </section>
 
-                <div v-if="activeTab==='permohonan'" class="animate-fade-in">
-                    <h2 class="text-2xl font-bold mb-6" style="color:var(--color-text-primary)">Permohonan Informasi</h2>
-                    <div class="card p-8">
-                        <p class="mb-6" style="color:var(--color-text-secondary)">Untuk mengajukan permohonan informasi publik, silakan hubungi PPID BPMP Provinsi NTB melalui:</p>
-                        <div class="grid md:grid-cols-2 gap-6 mb-6">
-                            <div class="p-5 rounded-xl bg-gray-50 border border-gray-100">
-                                <div class="flex items-center gap-3 mb-3"><div class="w-10 h-10 rounded-full flex items-center justify-center" style="background:color-mix(in srgb, var(--color-primary) 10%, transparent)"><i class="fas fa-envelope" style="color:var(--color-primary)"></i></div><span class="font-semibold" style="color:var(--color-text-primary)">Email</span></div>
-                                <p style="color:var(--color-text-secondary)">{{ profile?.permohonan_email || setting?.email || 'ntblpmp@gmail.com' }}</p>
-                            </div>
-                            <div class="p-5 rounded-xl bg-gray-50 border border-gray-100">
-                                <div class="flex items-center gap-3 mb-3"><div class="w-10 h-10 rounded-full flex items-center justify-center" style="background:color-mix(in srgb, var(--color-accent) 10%, transparent)"><i class="fas fa-phone" style="color:var(--color-accent)"></i></div><span class="font-semibold" style="color:var(--color-text-primary)">Telepon</span></div>
-                                <p style="color:var(--color-text-secondary)">{{ profile?.permohonan_phone || setting?.phone || '0811-390-6669' }}</p>
-                            </div>
-                        </div>
-                        <div v-if="profile?.permohonan_link" class="text-center">
-                            <a :href="profile.permohonan_link" target="_blank" class="btn-primary inline-flex items-center gap-2 text-base px-8 py-3">
-                                <i class="fas fa-file-alt"></i> Isi Formulir Permohonan Informasi
-                            </a>
-                        </div>
-                    </div>
-                </div>
+                        <section v-if="activeTab==='standar'" class="tab-panel">
+                            <template v-if="!viewStd">
+                                <header class="section-header"><div><span>Kualitas Pelayanan</span><h2>Standar Pelayanan</h2><p>Ketentuan dan prosedur yang menjadi acuan dalam setiap layanan.</p></div><div class="section-number">05</div></header>
+                                <div v-if="standards.length" class="standard-grid"><button v-for="(standard,index) in standards" :key="standard.id" @click="viewStd=standard" class="standard-card"><span>{{ String(index+1).padStart(2,'0') }}</span><div><i class="fas fa-clipboard-check"></i><h3>{{ standard.title }}</h3><small>Lihat standar dan prosedur</small></div><i class="fas fa-arrow-right"></i></button></div><EmptyState v-else icon="fas fa-clipboard-list" title="Belum ada standar pelayanan" />
+                            </template>
+                            <article v-else class="standard-detail"><button @click="viewStd=null" class="back-button"><i class="fas fa-arrow-left"></i>Kembali</button><header><span><i class="fas fa-file-shield"></i></span><div><small>Standar Pelayanan</small><h2>{{ viewStd.title }}</h2></div></header><div v-if="viewStd.content" class="editorial-content" v-html="viewStd.content"></div><a v-if="viewStd.file" :href="'/upload/ppid/'+viewStd.file" target="_blank" rel="noopener noreferrer" class="btn-primary"><i class="fas fa-file-pdf"></i>Lihat Dokumen POS</a></article>
+                        </section>
 
-                <div v-if="externalLinks.length" class="mt-12">
-                    <h2 class="text-2xl font-bold mb-6" style="color:var(--color-text-primary)">Link Eksternal</h2>
-                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                        <a v-for="item in externalLinks" :key="item.id" :href="item.link" target="_blank" class="card group hover:shadow-lg hover:-translate-y-1 transition-all overflow-hidden">
-                            <div class="aspect-square bg-gray-100 overflow-hidden">
-                                <img v-if="item.image" :src="'/upload/ppid/'+item.image" class="w-full h-full object-cover group-hover:scale-105 transition-transform" :alt="item.title">
-                                <div v-else class="w-full h-full flex items-center justify-center"><i class="fas fa-link text-3xl text-gray-300"></i></div>
-                            </div>
-                            <div class="p-3 text-center">
-                                <h4 class="text-sm font-semibold truncate" style="color:var(--color-text-primary)">{{ item.title }}</h4>
-                            </div>
-                        </a>
+                        <section v-if="activeTab==='regulasi'" class="tab-panel">
+                            <header class="section-header"><div><span>Dasar Hukum</span><h2>Regulasi</h2><p>Peraturan dan landasan hukum penyelenggaraan keterbukaan informasi publik.</p></div><div class="section-number">06</div></header>
+                            <div v-if="profile?.regulasi_profil" class="content-surface editorial-content compact" v-html="profile.regulasi_profil"></div>
+                            <label class="search-box"><i class="fas fa-search"></i><input v-model="regSearch" type="search" placeholder="Cari judul, nomor, atau pembuat regulasi..."></label>
+                            <div v-if="filteredRegulations.length" class="regulation-list"><article v-for="(reg,index) in filteredRegulations" :key="reg.id"><span class="reg-number">{{ String(index+1).padStart(2,'0') }}</span><div class="reg-copy"><small>{{ reg.nomor || 'Dokumen regulasi' }}</small><h3>{{ reg.title }}</h3><div v-if="reg.description" class="document-description" v-html="reg.description"></div><div class="reg-meta"><span v-if="reg.pembuat"><i class="fas fa-building"></i>{{ reg.pembuat }}</span><span v-if="reg.tanggal"><i class="fas fa-calendar"></i>{{ getYear(reg.tanggal) }}</span></div></div><div class="reg-actions"><a v-if="reg.file" :href="'/upload/ppid/'+reg.file" download aria-label="Unduh regulasi"><i class="fas fa-download"></i></a><a v-if="reg.link" :href="reg.link" target="_blank" rel="noopener noreferrer" aria-label="Buka tautan regulasi"><i class="fas fa-arrow-up-right-from-square"></i></a></div></article></div><EmptyState v-else :icon="regSearch?'fas fa-search':'fas fa-gavel'" :title="regSearch?'Regulasi tidak ditemukan':'Belum ada regulasi'" />
+                        </section>
+
+                        <section v-if="activeTab==='laporan'" class="tab-panel">
+                            <header class="section-header"><div><span>Akuntabilitas</span><h2>Laporan Tahunan</h2><p>Dokumen pelaksanaan dan capaian layanan informasi publik.</p></div><div class="section-number">07</div></header>
+                            <div v-if="annualReports.length" class="report-grid"><article v-for="(report,index) in annualReports" :key="report.id"><div class="report-year">{{ report.tahun || getYear(report.created_at) || String(index+1).padStart(2,'0') }}</div><div><h3>{{ report.title }}</h3><div v-if="report.description" class="document-description" v-html="report.description"></div><footer><a v-if="report.link" :href="report.link" target="_blank" rel="noopener noreferrer"><i class="fas fa-eye"></i>Lihat</a><a v-if="report.file" :href="'/upload/ppid/'+report.file" download><i class="fas fa-download"></i>Unduh</a></footer></div></article></div><EmptyState v-else icon="fas fa-file-lines" title="Belum ada laporan tahunan" />
+                        </section>
+
+                        <section v-if="activeTab==='maklumat'" class="tab-panel">
+                            <header class="section-header"><div><span>Komitmen Layanan</span><h2>Maklumat Pelayanan</h2><p>Pernyataan resmi komitmen BPMP Provinsi NTB dalam memberikan layanan terbaik.</p></div><div class="section-number">08</div></header>
+                            <article class="ppid-pledge"><div class="pledge-seal"><i class="fas fa-shield-check"></i><small>PPID</small></div><div><span>Deklarasi Pelayanan Publik</span><blockquote>“Dengan ini, kami sanggup menyelenggarakan pelayanan sesuai standar pelayanan yang telah ditetapkan. Apabila tidak menepati janji ini, kami siap menerima sanksi sesuai peraturan perundang-undangan yang berlaku.”</blockquote><strong>BPMP Provinsi Nusa Tenggara Barat</strong></div></article>
+                        </section>
+
+                        <section v-if="activeTab==='permohonan'" class="tab-panel">
+                            <header class="section-header"><div><span>Layanan Pemohon</span><h2>Permohonan Informasi</h2><p>Ajukan permohonan melalui kanal resmi PPID BPMP Provinsi NTB.</p></div><div class="section-number">09</div></header>
+                            <div class="request-layout"><div class="request-copy"><span>Proses Sederhana</span><h3>Informasi publik dalam jangkauan Anda.</h3><p>Siapkan identitas dan rincian informasi yang dibutuhkan, kemudian hubungi kami atau isi formulir permohonan.</p><ol><li><b>01</b><span>Lengkapi identitas pemohon</span></li><li><b>02</b><span>Jelaskan informasi yang dibutuhkan</span></li><li><b>03</b><span>Pantau tindak lanjut permohonan</span></li></ol></div><div class="request-channels"><a :href="`mailto:${requestEmail}`"><i class="fas fa-envelope"></i><span><small>Email</small><strong>{{ requestEmail }}</strong></span></a><a :href="`tel:${requestPhone}`"><i class="fas fa-phone"></i><span><small>Telepon</small><strong>{{ requestPhone }}</strong></span></a><a v-if="profile?.permohonan_link" :href="profile.permohonan_link" target="_blank" rel="noopener noreferrer" class="request-form"><i class="fas fa-file-pen"></i><span><small>Formulir Online</small><strong>Isi Permohonan Informasi</strong></span><i class="fas fa-arrow-right"></i></a></div></div>
+                        </section>
                     </div>
-                </div>
+
+                    <section v-if="externalLinks.length" class="ppid-links"><header><span>Tautan Pendukung</span><h2>Terhubung dengan layanan informasi lainnya</h2></header><div><a v-for="link in externalLinks" :key="link.id" :href="link.link" target="_blank" rel="noopener noreferrer"><span><img v-if="link.image" :src="'/upload/ppid/'+link.image" :alt="link.title" loading="lazy"><i v-else class="fas fa-link"></i></span><strong>{{ link.title }}</strong><i class="fas fa-arrow-up-right-from-square"></i></a></div></section>
+                </template>
             </div>
-        </div>
+        </section>
     </PublicLayout>
 </template>
 
 <script setup>
-import {ref,computed,onMounted} from 'vue';
+import { ref, computed, onMounted, defineComponent, h } from 'vue';
 import api from '@/bootstrap.js';
 import PublicLayout from '@/layouts/PublicLayout.vue';
 
-const activeTab = ref('profil');
-const loading = ref(true);
-const profile = ref(null);
-const informations = ref({berkala:[],setiap_saat:[],serta_merta:[]});
-const allInformations = ref([]);
-const standards = ref([]);
-const regulations = ref([]);
-const annualReports = ref([]);
-const externalLinks = ref([]);
-const setting = ref(null);
-const viewStd = ref(null);
-const regSearch = ref('');
-
-const filteredRegulations = computed(() => {
-    if (!regSearch.value.trim()) return regulations.value;
-    const q = regSearch.value.toLowerCase();
-    return regulations.value.filter(r =>
-        (r.title && r.title.toLowerCase().includes(q)) ||
-        (r.nomor && r.nomor.toLowerCase().includes(q)) ||
-        (r.pembuat && r.pembuat.toLowerCase().includes(q)) ||
-        (r.description && r.description.toLowerCase().includes(q))
-    );
-});
-
-const tabs = [
-    {id:'profil',label:'Profil',icon:'fas fa-building'},
-    {id:'pejabat',label:'Profil Pejabat',icon:'fas fa-user-tie'},
-    {id:'sdm',label:'Profil SDM',icon:'fas fa-users'},
-    {id:'informasi',label:'Jenis Informasi',icon:'fas fa-info-circle'},
-    {id:'standar',label:'Standar Pelayanan',icon:'fas fa-clipboard-list'},
-    {id:'regulasi',label:'Regulasi',icon:'fas fa-gavel'},
-    {id:'laporan',label:'Laporan Tahunan',icon:'fas fa-file-alt'},
-    {id:'maklumat',label:'Maklumat',icon:'fas fa-scroll'},
-    {id:'permohonan',label:'Permohonan Info',icon:'fas fa-paper-plane'},
+const EmptyState = defineComponent({ props:{icon:String,title:String}, setup(props){ return()=>h('div',{class:'empty-state'},[h('span',{},[h('i',{class:props.icon})]),h('h3',{},props.title),h('p',{},'Konten akan ditampilkan setelah data tersedia.')]); }});
+const activeTab=ref('profil'); const loading=ref(true); const profile=ref(null); const informations=ref({berkala:[],setiap_saat:[],serta_merta:[]}); const allInformations=ref([]); const standards=ref([]); const regulations=ref([]); const annualReports=ref([]); const externalLinks=ref([]); const setting=ref(null); const viewStd=ref(null); const regSearch=ref('');
+const informationCount=computed(()=>new Set(Object.values(informations.value||{}).flatMap(list=>Array.isArray(list)?list.map(item=>item.id):[])).size);
+const requestEmail=computed(()=>profile.value?.permohonan_email||setting.value?.email||'ntblpmp@gmail.com');
+const requestPhone=computed(()=>profile.value?.permohonan_phone||setting.value?.phone||'0811-390-6669');
+const filteredRegulations=computed(()=>{if(!regSearch.value.trim())return regulations.value;const q=regSearch.value.toLowerCase();return regulations.value.filter(r=>[r.title,r.nomor,r.pembuat,r.description].some(v=>v&&v.toLowerCase().includes(q)));});
+const tabs=[
+    {id:'profil',label:'Profil',short:'Tentang',icon:'fas fa-building-columns'}, {id:'pejabat',label:'Pejabat',short:'Pengelola',icon:'fas fa-user-tie'}, {id:'sdm',label:'SDM',short:'Tim',icon:'fas fa-users'},
+    {id:'informasi',label:'Informasi',short:'Publik',icon:'fas fa-folder-open'}, {id:'standar',label:'Standar',short:'Layanan',icon:'fas fa-clipboard-check'}, {id:'regulasi',label:'Regulasi',short:'Hukum',icon:'fas fa-scale-balanced'},
+    {id:'laporan',label:'Laporan',short:'Tahunan',icon:'fas fa-file-lines'}, {id:'maklumat',label:'Maklumat',short:'Komitmen',icon:'fas fa-scroll'}, {id:'permohonan',label:'Permohonan',short:'Ajukan',icon:'fas fa-paper-plane'},
 ];
-
-const bulanIndo=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
-function formatDate(tgl){if(!tgl)return'-';const d=new Date(tgl);return isNaN(d)?tgl:`${d.getDate()} ${bulanIndo[d.getMonth()]} ${d.getFullYear()}`;}
-function getYear(tgl){if(!tgl)return'';const d=new Date(tgl);return isNaN(d)?tgl.substring(0,4):d.getFullYear();}
-
-onMounted(async()=>{
-    const[ppid,st]=await Promise.allSettled([api.get('/ppid'),api.get('/settings')]);
-    if(ppid.status==='fulfilled'){
-        profile.value=ppid.value.data.profile;
-        informations.value=ppid.value.data.informations||{};
-        allInformations.value=ppid.value.data.informations?.informasi||[];
-        standards.value=ppid.value.data.standards||[];
-        regulations.value=ppid.value.data.regulations||[];
-        annualReports.value=ppid.value.data.annualReports||[];
-        externalLinks.value=ppid.value.data.externalLinks||[];
-    }
-    if(st.status==='fulfilled')setting.value=st.value.data;
-    loading.value=false;
-});
+function setTab(id){activeTab.value=id;viewStd.value=null;requestAnimationFrame(()=>document.querySelector('.ppid-tabs')?.scrollIntoView({behavior:'smooth',block:'start'}));}
+function getYear(tgl){if(!tgl)return'';const d=new Date(tgl);return isNaN(d)?String(tgl).substring(0,4):d.getFullYear();}
+function documentIcon(doc){if(doc.file?.toLowerCase().endsWith('.pdf'))return'fas fa-file-pdf';if(doc.link)return'fas fa-link';return'fas fa-file-lines';}
+onMounted(async()=>{const[ppid,st]=await Promise.allSettled([api.get('/ppid'),api.get('/settings')]);if(ppid.status==='fulfilled'){const d=ppid.value.data;profile.value=d.profile;informations.value=d.informations||{};allInformations.value=d.informations?.informasi||[];standards.value=d.standards||[];regulations.value=d.regulations||[];annualReports.value=d.annualReports||[];externalLinks.value=d.externalLinks||[];}if(st.status==='fulfilled')setting.value=st.value.data;loading.value=false;});
 </script>
+
+<style scoped>
+.ppid-hero{position:relative;overflow:hidden;padding:68px 0 46px;background:#1e40af;color:#fff}.ppid-hero-grid{position:absolute;inset:0;opacity:.07;background-image:linear-gradient(rgba(255,255,255,.2) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.2) 1px,transparent 1px);background-size:48px 48px}.ppid-orb{position:absolute;border-radius:50%;filter:blur(55px)}.ppid-orb-a{right:-120px;top:-220px;width:580px;height:580px;background:rgba(96,165,250,.32)}.ppid-orb-b{left:-170px;bottom:-260px;width:460px;height:460px;background:rgba(14,165,233,.18)}.ppid-breadcrumb{display:flex;align-items:center;gap:9px;margin-bottom:32px;color:rgba(255,255,255,.48);font-size:11px}.ppid-breadcrumb a:hover{color:#fff}.ppid-breadcrumb i{font-size:7px}.ppid-hero-layout{display:grid;align-items:center;gap:38px}.ppid-eyebrow{display:inline-flex;align-items:center;gap:8px;margin-bottom:18px;padding:7px 12px;border:1px solid rgba(255,255,255,.15);border-radius:999px;background:rgba(255,255,255,.08);color:rgba(255,255,255,.72);font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase}.ppid-hero-copy h1{max-width:700px;color:#fff;font-size:clamp(2.5rem,6vw,4.8rem);line-height:1.04}.ppid-description{max-width:680px;margin-top:20px;color:rgba(255,255,255,.63);font-size:16px;line-height:1.8}.ppid-hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}.ppid-hero-actions button{display:inline-flex;align-items:center;gap:9px;padding:13px 19px;border-radius:12px;font-family:inherit;font-size:11px;font-weight:700;cursor:pointer;transition:.2s}.ppid-primary-action{border:1px solid #fff;background:#fff;color:#1e40af}.ppid-secondary-action{border:1px solid rgba(255,255,255,.17);background:rgba(255,255,255,.08);color:#fff}.ppid-hero-actions button:hover{transform:translateY(-2px);box-shadow:0 12px 25px rgba(15,30,80,.2)}.ppid-visual{position:relative;min-height:330px}.ppid-visual>img,.ppid-visual-placeholder{width:100%;height:360px;border:1px solid rgba(255,255,255,.14);border-radius:26px;object-fit:cover;box-shadow:0 25px 60px rgba(7,22,70,.25)}.ppid-visual-placeholder{display:flex;align-items:center;justify-content:center;flex-direction:column;background:rgba(255,255,255,.08);color:rgba(255,255,255,.8);backdrop-filter:blur(12px)}.ppid-visual-placeholder i{font-size:58px}.ppid-visual-placeholder span{margin-top:15px;font-size:28px;font-weight:900;letter-spacing:.1em}.ppid-visual-placeholder small{margin-top:4px;color:rgba(255,255,255,.4);font-size:9px;letter-spacing:.12em;text-transform:uppercase}.ppid-trust-card{position:absolute;right:-14px;bottom:22px;display:flex;align-items:center;gap:11px;padding:13px 15px;border:1px solid rgba(255,255,255,.55);border-radius:15px;background:rgba(255,255,255,.92);box-shadow:0 16px 34px rgba(10,30,80,.18);backdrop-filter:blur(12px)}.ppid-trust-card>span{display:grid;place-items:center;width:35px;height:35px;border-radius:11px;background:#dcfce7;color:#16a34a}.ppid-trust-card strong,.ppid-trust-card small{display:block}.ppid-trust-card strong{color:#334155;font-size:10px}.ppid-trust-card small{margin-top:2px;color:#94a3b8;font-size:8px}.ppid-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;overflow:hidden;margin-top:48px;border:1px solid rgba(255,255,255,.1);border-radius:18px;background:rgba(255,255,255,.1)}.ppid-stats>div{display:flex;align-items:center;gap:11px;padding:16px;background:rgba(15,45,130,.68)}.ppid-stats>div>i{color:#93c5fd}.ppid-stats strong,.ppid-stats small{display:block}.ppid-stats strong{color:#fff;font-size:18px}.ppid-stats small{color:rgba(255,255,255,.43);font-size:8px;text-transform:uppercase;letter-spacing:.07em}
+.ppid-main{padding:54px 0 94px;background:#f6f8fc}.ppid-tabs{position:sticky;top:76px;z-index:30;display:flex;gap:7px;overflow-x:auto;margin-bottom:28px;padding:8px;border:1px solid #e2e8f0;border-radius:20px;background:rgba(255,255,255,.92);box-shadow:0 14px 40px rgba(15,23,42,.06);backdrop-filter:blur(18px);scrollbar-width:none}.ppid-tabs::-webkit-scrollbar{display:none}.ppid-tabs button{display:grid;grid-template-columns:32px auto;grid-template-rows:auto auto;min-width:132px;padding:10px 12px;border:0;border-radius:14px;background:transparent;color:#64748b;text-align:left;cursor:pointer;transition:.2s}.ppid-tabs button>span{grid-row:1/3;display:grid;place-items:center;width:32px;height:32px;margin-right:9px;border-radius:10px;background:#f1f5f9;color:#94a3b8}.ppid-tabs small,.ppid-tabs strong{display:block}.ppid-tabs small{color:#94a3b8;font-size:7px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}.ppid-tabs strong{font-size:10px}.ppid-tabs button.active{background:#eff6ff;color:var(--color-primary)}.ppid-tabs button.active>span{background:var(--color-primary);color:#fff;box-shadow:0 8px 18px rgba(37,99,235,.22)}.ppid-content{min-height:500px}.tab-panel{animation:panelIn .35s ease}.section-header{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:30px}.section-header>div:first-child>span{display:block;margin-bottom:6px;color:var(--color-primary);font-size:9px;font-weight:800;letter-spacing:.13em;text-transform:uppercase}.section-header h2{color:#263238;font-size:clamp(1.8rem,4vw,2.8rem)}.section-header p{max-width:650px;margin-top:9px;color:#78909c;font-size:13px;line-height:1.65}.section-number{color:#dbeafe;font-size:62px;font-weight:900;line-height:1}.content-surface,.intro-content,.profile-feature,.structure-card,.contact-card,.standard-detail{border:1px solid #e2e8f0;border-radius:24px;background:#fff;box-shadow:0 16px 50px rgba(15,23,42,.055)}.content-surface,.intro-content{padding:30px}.compact{margin-bottom:22px}.vision-grid{display:grid;gap:18px;margin-top:20px}.vision-grid article{padding:26px;border:1px solid #e2e8f0;border-radius:22px;background:#fff;box-shadow:0 12px 36px rgba(15,23,42,.045)}.vision-grid article>span,.feature-icon{display:grid;place-items:center;width:48px;height:48px;margin-bottom:17px;border-radius:14px;background:#eff6ff;color:var(--color-primary)}.vision-grid article:nth-child(2)>span{background:#fff7ed;color:#f59e0b}.vision-grid small,.profile-feature small,.structure-card small,.contact-card small{display:block;margin-bottom:4px;color:#94a3b8;font-size:8px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}.vision-grid h3,.profile-feature h3,.structure-card h3,.contact-card h3{margin-bottom:10px;color:#334155;font-size:18px}.profile-feature{display:grid;gap:20px;margin-top:20px;padding:28px}.feature-icon{margin:0}.structure-card{margin-top:20px;padding:26px;text-align:center}.structure-card header{display:flex;align-items:center;gap:12px;margin-bottom:20px;text-align:left}.structure-card header>span{display:grid;place-items:center;width:44px;height:44px;border-radius:13px;background:#eff6ff;color:var(--color-primary)}.structure-card img{max-width:100%;margin:auto;border-radius:16px}.contact-card{display:grid;gap:22px;margin-top:20px;padding:28px;background:#1e40af;color:#fff}.contact-card h3{color:#fff}.contact-card p{color:rgba(255,255,255,.55);font-size:12px}.contact-card .editorial-content{color:rgba(255,255,255,.75)}
+.document-grid,.standard-grid,.report-grid{display:grid;gap:18px}.document-card{display:flex;min-height:245px;flex-direction:column;padding:24px;border:1px solid #e2e8f0;border-radius:22px;background:#fff;box-shadow:0 12px 36px rgba(15,23,42,.045);transition:.25s}.document-card:hover{transform:translateY(-4px);border-color:#bfdbfe;box-shadow:0 22px 50px rgba(15,23,42,.09)}.document-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:25px}.document-top span{color:#cbd5e1;font-size:25px;font-weight:900}.document-top i{display:grid;place-items:center;width:42px;height:42px;border-radius:13px;background:#eff6ff;color:var(--color-primary)}.document-card h3{margin-bottom:10px;color:#334155;font-size:16px;line-height:1.4}.document-description{display:-webkit-box;overflow:hidden;color:#78909c;font-size:11px;line-height:1.65;-webkit-box-orient:vertical;-webkit-line-clamp:3}.document-card footer{display:flex;align-items:center;flex-wrap:wrap;gap:12px;margin-top:auto;padding-top:20px}.document-card footer a,.document-card footer span{display:inline-flex;align-items:center;gap:6px;color:var(--color-primary);font-size:9px;font-weight:700}.standard-card{display:grid;grid-template-columns:42px 1fr auto;align-items:center;gap:15px;padding:20px;border:1px solid #e2e8f0;border-radius:19px;background:#fff;text-align:left;cursor:pointer;transition:.25s}.standard-card:hover{transform:translateY(-3px);border-color:#bfdbfe;box-shadow:0 16px 36px rgba(15,23,42,.08)}.standard-card>span{color:#cbd5e1;font-size:18px;font-weight:900}.standard-card div>i{margin-bottom:11px;color:var(--color-primary);font-size:18px}.standard-card h3{color:#334155;font-size:13px}.standard-card small{display:block;margin-top:4px;color:#94a3b8;font-size:8px}.standard-card>i{color:#cbd5e1;font-size:10px}.standard-detail{padding:30px}.back-button{display:inline-flex;align-items:center;gap:8px;margin-bottom:25px;padding:9px 12px;border:1px solid #e2e8f0;border-radius:10px;background:#fff;color:#64748b;font-family:inherit;font-size:10px;font-weight:700;cursor:pointer}.standard-detail>header{display:flex;align-items:center;gap:15px;margin-bottom:25px}.standard-detail>header>span{display:grid;place-items:center;width:54px;height:54px;border-radius:16px;background:#eff6ff;color:var(--color-primary);font-size:19px}.standard-detail header small{color:#94a3b8;font-size:8px;text-transform:uppercase;letter-spacing:.1em}.standard-detail h2{color:#263238;font-size:24px}.standard-detail .btn-primary{margin-top:22px}
+.search-box{position:relative;display:block;margin-bottom:20px}.search-box i{position:absolute;top:50%;left:15px;color:#94a3b8;transform:translateY(-50%)}.search-box input{width:100%;height:48px;padding:0 16px 0 42px;border:1px solid #dce4ec;border-radius:14px;outline:0;background:#fff;color:#334155;font-family:inherit;font-size:12px;transition:.2s}.search-box input:focus{border-color:#93c5fd;box-shadow:0 0 0 4px rgba(37,99,235,.07)}.regulation-list{display:grid;gap:13px}.regulation-list article{display:grid;grid-template-columns:42px minmax(0,1fr) auto;align-items:start;gap:15px;padding:20px;border:1px solid #e2e8f0;border-radius:19px;background:#fff}.reg-number{display:grid;place-items:center;width:38px;height:38px;border-radius:11px;background:#eff6ff;color:var(--color-primary);font-size:10px;font-weight:800}.reg-copy>small{display:block;margin-bottom:4px;color:var(--color-primary);font-size:8px;font-weight:700}.reg-copy h3{margin-bottom:7px;color:#334155;font-size:14px}.reg-meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}.reg-meta span{display:inline-flex;align-items:center;gap:5px;color:#94a3b8;font-size:8px}.reg-actions{display:flex;gap:6px}.reg-actions a{display:grid;place-items:center;width:34px;height:34px;border:1px solid #e2e8f0;border-radius:10px;color:#64748b}.reg-actions a:hover{border-color:#bfdbfe;color:var(--color-primary)}.report-grid article{display:grid;grid-template-columns:85px minmax(0,1fr);gap:20px;padding:22px;border:1px solid #e2e8f0;border-radius:22px;background:#fff}.report-year{display:grid;place-items:center;min-height:85px;border-radius:17px;background:#1e40af;color:#fff;font-size:18px;font-weight:900}.report-grid h3{margin:5px 0 8px;color:#334155;font-size:15px}.report-grid footer{display:flex;gap:8px;margin-top:14px}.report-grid footer a{display:inline-flex;align-items:center;gap:6px;padding:8px 11px;border-radius:9px;background:#eff6ff;color:var(--color-primary);font-size:9px;font-weight:700}
+.ppid-pledge{position:relative;display:grid;overflow:hidden;border-radius:26px;background:#173d9a;color:#fff;box-shadow:0 28px 75px rgba(30,64,175,.22)}.ppid-pledge::after{content:'PPID';position:absolute;right:-24px;bottom:-45px;color:rgba(255,255,255,.04);font-size:150px;font-weight:900}.pledge-seal{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;flex-direction:column;padding:32px;border-bottom:1px solid rgba(255,255,255,.12);background:#102f7d}.pledge-seal i{font-size:50px}.pledge-seal small{margin-top:10px;color:rgba(255,255,255,.5);letter-spacing:.15em}.ppid-pledge>div:last-child{position:relative;z-index:1;padding:34px}.ppid-pledge>div:last-child>span{color:#93c5fd;font-size:9px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}.ppid-pledge blockquote{max-width:760px;margin:20px 0;color:rgba(255,255,255,.82);font-family:Georgia,'Times New Roman',serif;font-size:clamp(1.1rem,2.5vw,1.45rem);font-style:italic;line-height:1.8}.ppid-pledge strong{color:rgba(255,255,255,.5);font-size:10px;letter-spacing:.09em;text-transform:uppercase}.request-layout{display:grid;overflow:hidden;border:1px solid #e2e8f0;border-radius:25px;background:#fff;box-shadow:0 18px 52px rgba(15,23,42,.06)}.request-copy{padding:32px;background:#1e40af;color:#fff}.request-copy>span{color:#93c5fd;font-size:9px;font-weight:800;letter-spacing:.13em;text-transform:uppercase}.request-copy h3{margin:8px 0 12px;color:#fff;font-size:28px}.request-copy>p{color:rgba(255,255,255,.6);font-size:12px;line-height:1.7}.request-copy ol{display:grid;gap:11px;margin-top:24px}.request-copy li{display:flex;align-items:center;gap:12px;color:rgba(255,255,255,.72);font-size:10px}.request-copy li b{display:grid;place-items:center;width:30px;height:30px;border:1px solid rgba(255,255,255,.13);border-radius:9px;background:rgba(255,255,255,.08);color:#fff}.request-channels{display:grid;align-content:center;gap:12px;padding:30px}.request-channels>a{display:grid;grid-template-columns:42px minmax(0,1fr) auto;align-items:center;gap:12px;padding:15px;border:1px solid #e2e8f0;border-radius:16px;background:#f8fafc}.request-channels>a>i:first-child{display:grid;place-items:center;width:42px;height:42px;border-radius:12px;background:#eff6ff;color:var(--color-primary)}.request-channels small,.request-channels strong{display:block}.request-channels small{margin-bottom:3px;color:#94a3b8;font-size:8px;text-transform:uppercase;letter-spacing:.08em}.request-channels strong{overflow-wrap:anywhere;color:#334155;font-size:11px}.request-form{border-color:#bfdbfe!important;background:#eff6ff!important;color:var(--color-primary)}
+.ppid-links{margin-top:55px}.ppid-links header{margin-bottom:20px}.ppid-links header>span{color:var(--color-primary);font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}.ppid-links h2{margin-top:5px;color:#334155;font-size:22px}.ppid-links>div{display:grid;gap:12px}.ppid-links a{display:grid;grid-template-columns:44px minmax(0,1fr) auto;align-items:center;gap:12px;padding:13px;border:1px solid #e2e8f0;border-radius:16px;background:#fff;color:#64748b;transition:.2s}.ppid-links a:hover{transform:translateY(-2px);border-color:#bfdbfe;color:var(--color-primary);box-shadow:0 12px 28px rgba(15,23,42,.06)}.ppid-links a>span{display:grid;place-items:center;width:44px;height:44px;overflow:hidden;border-radius:12px;background:#eff6ff;color:var(--color-primary)}.ppid-links img{width:100%;height:100%;object-fit:cover}.ppid-links strong{overflow:hidden;font-size:11px;text-overflow:ellipsis;white-space:nowrap}.ppid-links>a>i{font-size:9px}.empty-state{padding:65px 24px;text-align:center;border:1px dashed #cbd5e1;border-radius:22px;background:#fff}.empty-state>span{display:grid;place-items:center;width:62px;height:62px;margin:0 auto 18px;border-radius:18px;background:#eff6ff;color:var(--color-primary);font-size:24px}.empty-state h3{color:#475569;font-size:16px}.empty-state p{margin-top:6px;color:#94a3b8;font-size:11px}
+:deep(.editorial-content){color:#52616b;font-size:14px;line-height:1.85}:deep(.editorial-content p){margin:0 0 1em}:deep(.editorial-content h2),:deep(.editorial-content h3),:deep(.editorial-content h4){margin:1.4em 0 .6em;color:#263238}:deep(.editorial-content ul),:deep(.editorial-content ol){margin:1em 0;padding-left:1.3em}:deep(.editorial-content li){margin:.35em 0}:deep(.editorial-content a){color:var(--color-primary);text-decoration:underline;text-underline-offset:3px}:deep(.editorial-content img){max-width:100%;height:auto;border-radius:14px}:deep(.editorial-content table){display:block;max-width:100%;overflow-x:auto;border-collapse:collapse}:deep(.editorial-content td),:deep(.editorial-content th){padding:9px 11px;border:1px solid #e2e8f0}
+@keyframes panelIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@media(min-width:768px){.ppid-hero-layout{grid-template-columns:minmax(0,1.08fr) minmax(330px,.92fr)}.ppid-stats{grid-template-columns:repeat(4,minmax(0,1fr))}.vision-grid,.document-grid,.report-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.profile-feature{grid-template-columns:auto 1fr}.contact-card{grid-template-columns:.7fr 1.3fr}.standard-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.ppid-pledge{grid-template-columns:190px 1fr}.pledge-seal{border-right:1px solid rgba(255,255,255,.1);border-bottom:0}.request-layout{grid-template-columns:.9fr 1.1fr}.ppid-links>div{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(min-width:1100px){.document-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.standard-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:767px){.ppid-hero{padding:52px 0 36px}.ppid-visual{min-height:270px}.ppid-visual>img,.ppid-visual-placeholder{height:290px}.ppid-trust-card{right:8px;bottom:10px}.ppid-main{padding:36px 0 70px}.ppid-tabs{top:66px;margin-right:-16px;margin-left:-16px;border-right:0;border-left:0;border-radius:0;padding-right:16px;padding-left:16px}.section-header{align-items:flex-start}.section-number{font-size:45px}.content-surface,.intro-content,.profile-feature,.structure-card,.contact-card,.standard-detail{padding:22px}.regulation-list article{grid-template-columns:36px minmax(0,1fr)}.reg-actions{grid-column:2}.report-grid article{grid-template-columns:65px minmax(0,1fr)}.report-year{min-height:65px;font-size:13px}.ppid-links>div{grid-template-columns:1fr}}
+</style>

@@ -338,7 +338,11 @@ async function saveNavigations(){
 function editInfo(item){editInfoId.value=item.id;Object.assign(infoForm,{category:'informasi',title:item.title,description:item.description||'',link:'',file:null,status:1});}
 async function saveInfo(){
     const fd=new FormData();fd.append('category','informasi');fd.append('title',infoForm.title);fd.append('description',infoForm.description);fd.append('status','1');
-    try{if(editInfoId.value)await api.post(`${BASE}/informations/${editInfoId.value}`,fd,{headers:{'Content-Type':'multipart/form-data'}});else await api.post(`${BASE}/informations`,fd,{headers:{'Content-Type':'multipart/form-data'}});swalSuccess('Tersimpan!');editInfoId.value=null;infoForm.title='';infoForm.description='';loadAll();}catch(e){swalError('Gagal');}
+    try{
+        if(editInfoId.value){fd.append('_method','PUT');await api.post(`${BASE}/informations/${editInfoId.value}`,fd,{headers:{'Content-Type':'multipart/form-data'}});}
+        else await api.post(`${BASE}/informations`,fd,{headers:{'Content-Type':'multipart/form-data'}});
+        swalSuccess('Tersimpan!');editInfoId.value=null;infoForm.title='';infoForm.description='';loadAll();
+    }catch(e){swalError(e.response?.data?.message||'Gagal menyimpan informasi');}
 }
 async function deleteInfo(id){if(!await swalConfirm('Hapus?'))return;try{await api.delete(`${BASE}/informations/${id}`);swalSuccess('Dihapus!');loadAll();}catch(e){swalError('Gagal');}}
 

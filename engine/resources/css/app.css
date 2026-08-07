@@ -50,6 +50,7 @@
         -moz-osx-font-smoothing: grayscale;
         overflow-x: hidden;
     }
+    html { scroll-behavior: smooth; }
     h1,h2,h3,h4,h5,h6 { font-weight: 700; line-height: 1.15; letter-spacing: -0.02em; color: #263238; }
     img { max-width: 100%; height: auto; }
     * { scrollbar-width: thin; scrollbar-color: #b0bec5 transparent; }
@@ -118,6 +119,9 @@
     }
     .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(37,99,235,0.35); background: var(--color-primary-light); }
     .btn-primary:active { transform: translateY(0); }
+    .btn-primary:disabled,
+    .btn-outline:disabled,
+    .btn-secondary:disabled { opacity: .5; cursor: not-allowed; transform: none; box-shadow: none; }
 
     .btn-secondary {
         display: inline-flex; align-items: center; justify-content: center; gap: 8px;
@@ -250,6 +254,10 @@
     .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     .line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
     .text-balance { text-wrap: balance; }
+    .surface-grid {
+        background-image: linear-gradient(rgba(37,99,235,.045) 1px, transparent 1px), linear-gradient(90deg, rgba(37,99,235,.045) 1px, transparent 1px);
+        background-size: 48px 48px;
+    }
 }
 
 .reveal {

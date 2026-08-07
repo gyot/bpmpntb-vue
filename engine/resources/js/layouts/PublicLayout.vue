@@ -276,42 +276,28 @@
             </div>
         </footer>
 
-        <button v-if="!chatbotLoaded" @click="chatbotLoaded = true" class="chatbot-trigger" aria-label="Buka chatbot Si Intan">
-            <img src="/intan.png" alt="INTAN" class="w-9 h-9 rounded-full object-cover" @error="$event.target.style.display='none'" loading="lazy" width="36" height="36">
-            <span class="chatbot-trigger-text">Tanya INTAN</span>
-        </button>
-        <Chatbot v-if="chatbotLoaded" />
-
-        <button v-if="!a11yLoaded" @click="a11yLoaded = true" class="a11y-trigger" aria-label="Buka pengaturan aksesibilitas">
-            <i class="fas fa-universal-access"></i>
-        </button>
-        <AccessibilityWidget v-if="a11yLoaded" />
+        <Chatbot />
+        <AccessibilityWidget />
     </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted, watch, nextTick, defineAsyncComponent } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import api from '@/bootstrap.js';
+import { ref, computed, onMounted, onUnmounted, watch, defineAsyncComponent } from 'vue';
+import { useRoute } from 'vue-router';
 import MobileAccordion from '@/components/MobileAccordion.vue';
+import { usePublicData } from '@/composables/usePublicData.js';
 
 const Chatbot = defineAsyncComponent(() => import('@/components/Chatbot.vue'));
 const AccessibilityWidget = defineAsyncComponent(() => import('@/components/AccessibilityWidget.vue'));
 
 const route = useRoute();
-const router = useRouter();
-const setting = ref(null);
+const { setting, beranda, layanan, visitorStats, fetchAll } = usePublicData();
 const profil = ref([]);
-const layanan = ref([]);
 const pengumuman = ref([]);
-const visitorStats = ref(null);
-const scrolled = ref(false);
 const scrollY = ref(0);
 const mobileMenu = ref(false);
 const openAccs = ref(new Set());
 const mobileWrap = ref(null);
-const chatbotLoaded = ref(false);
-const a11yLoaded = ref(false);
 const mapLoaded = ref(false);
 
 const isHome = computed(() => route.path === '/');
@@ -339,12 +325,12 @@ const headerStyle = computed(() => {
     if (!isHome) {
         return {
             background: 'var(--color-primary)',
-            boxShadow: '0 2px 16px rgba(37,99,235,0.25)',
+            boxShadow: '0 8px 32px color-mix(in srgb, var(--color-primary) 24%, transparent)',
         };
     }
     return {
-        background: `rgba(37,99,235,${opacity})`,
-        boxShadow: `0 2px 16px rgba(37,99,235,${opacity * 0.2})`,
+        background: `color-mix(in srgb, var(--color-primary) ${Math.round(opacity * 100)}%, transparent)`,
+        boxShadow: `0 8px 32px color-mix(in srgb, var(--color-primary) ${Math.round(opacity * 22)}%, transparent)`,
         backdropFilter: raw < 0.9 ? 'blur(12px)' : 'none',
     };
 });
@@ -369,8 +355,12 @@ function autoOpenActive() {
 }
 
 watch(() => route.path, () => closeMobile());
+watch(beranda, (data) => {
+    profil.value = data?.profil || [];
+    pengumuman.value = data?.pengumuman || [];
+}, { immediate: true });
 function onKeydown(e) { if (e.key === 'Escape' && mobileMenu.value) closeMobile(); }
-function onScroll() { scrollY.value = window.scrollY; scrolled.value = window.scrollY > 60; }
+function onScroll() { scrollY.value = window.scrollY; }
 
 function setupDropdownFlip() {
     const header = document.querySelector('header');
@@ -386,17 +376,12 @@ function setupDropdownFlip() {
     }, true);
 }
 
-onMounted(async () => {
+onMounted(() => {
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('keydown', onKeydown);
     onScroll();
     setupDropdownFlip();
-    const results = await Promise.allSettled([api.get('/settings'), api.get('/beranda'), api.get('/visitor-stats'), api.get('/layanans-public')]);
-    const [s, b, v, l] = results;
-    if (s.status==='fulfilled') setting.value = s.value.data;
-    if (b.status==='fulfilled') { profil.value = b.value.data.profil||[]; pengumuman.value = b.value.data.pengumuman||[]; }
-    if (v.status==='fulfilled') visitorStats.value = v.value.data;
-    if (l.status==='fulfilled') layanan.value = l.value.data||[];
+    fetchAll();
 });
 
 onUnmounted(() => { window.removeEventListener('scroll', onScroll); window.removeEventListener('keydown', onKeydown); document.body.style.overflow = ''; });
@@ -440,31 +425,6 @@ onUnmounted(() => { window.removeEventListener('scroll', onScroll); window.remov
     transition: all 0.15s; text-decoration: none;
 }
 .dropdown-item:hover { background: rgba(37,99,235,0.06); color: var(--color-primary); padding-left: 18px; }
-
-.chatbot-trigger {
-    position: fixed; bottom: 24px; right: 24px; z-index: 40;
-    display: flex; align-items: center; gap: 10px;
-    padding: 12px 20px 12px 12px; border-radius: 999px;
-    background: var(--color-primary);
-    color: white; box-shadow: 0 8px 32px rgba(37,99,235,0.25);
-    cursor: pointer; border: none; font-family: 'Inter', sans-serif;
-    font-size: 13px; font-weight: 600;
-    transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
-}
-.chatbot-trigger:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 12px 40px rgba(37,99,235,0.35); }
-.chatbot-trigger-text { display: none; }
-@media (min-width: 640px) { .chatbot-trigger-text { display: inline; } }
-
-.a11y-trigger {
-    position: fixed; bottom: 24px; left: 24px; z-index: 40;
-    width: 46px; height: 46px; border-radius: 999px;
-    background: var(--color-secondary); color: white;
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer; border: 1px solid rgba(255,255,255,0.1); font-size: 18px;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.3);
-    transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
-}
-.a11y-trigger:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
 
 @keyframes ticker { 0%{transform:translateX(100%)} 100%{transform:translateX(-100%)} }
 </style>

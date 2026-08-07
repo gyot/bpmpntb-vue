@@ -1,16 +1,20 @@
 <template>
     <div>
-        <!-- Year selector -->
-        <div class="flex items-center justify-between mb-6 flex-wrap gap-3">
-            <h2 class="text-lg font-bold" style="color:var(--color-text-primary)">
-                <i class="fas fa-tachometer-alt mr-2" style="color:var(--color-primary)"></i>Dashboard
-            </h2>
-            <div class="flex items-center gap-2">
+        <section class="dashboard-hero">
+            <div class="dashboard-hero-grid"></div>
+            <div class="dashboard-welcome">
+                <span>Ringkasan Kinerja Digital</span>
+                <h2>Dashboard BPMP Provinsi NTB</h2>
+                <p>Pantau publikasi, keterjangkauan informasi, dan aktivitas pengunjung dalam satu tampilan.</p>
+            </div>
+            <div class="year-control">
+                <label for="dashboard-year">Periode data</label>
                 <select v-model="selectedYear" @change="fetchStats" class="year-select">
+                    <option disabled value="">Pilih tahun</option>
                     <option v-for="y in yearOptions" :key="y" :value="y">{{ y }}</option>
                 </select>
             </div>
-        </div>
+        </section>
 
         <!-- Stats Cards -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
@@ -475,13 +479,23 @@ async function copyTable() {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.06);
     border: 1px solid #f3f4f6;
 }
+.dashboard-hero { position:relative; display:flex; align-items:center; justify-content:space-between; gap:24px; overflow:hidden; margin-bottom:24px; padding:28px 30px; border-radius:24px; background:#1E40AF; box-shadow:0 20px 55px rgba(30,64,175,.18); }
+.dashboard-hero-grid { position:absolute; inset:0; opacity:.08; background-image:linear-gradient(rgba(255,255,255,.2) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.2) 1px,transparent 1px); background-size:40px 40px; }
+.dashboard-welcome,.year-control { position:relative; z-index:1; }
+.dashboard-welcome>span { display:block; margin-bottom:7px; color:rgba(255,255,255,.48); font-size:9px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; }
+.dashboard-welcome h2 { color:#fff; font-size:24px; margin-bottom:7px; }
+.dashboard-welcome p { max-width:600px; color:rgba(255,255,255,.62); font-size:12px; line-height:1.65; }
+.year-control { min-width:145px; padding:12px; border:1px solid rgba(255,255,255,.13); border-radius:15px; background:rgba(255,255,255,.09); backdrop-filter:blur(10px); }
+.year-control label { display:block; margin-bottom:6px; color:rgba(255,255,255,.45); font-size:8px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; }
 .stat-card {
     padding: 1.25rem 1.5rem;
-    border-left: 4px solid transparent;
+    border-top: 3px solid transparent;
+    border-left: 0;
     transition: all 0.3s ease;
 }
 .stat-card:hover {
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    transform: translateY(-3px);
 }
 .stat-icon {
     width: 48px;
@@ -492,16 +506,17 @@ async function copyTable() {
     border-radius: 50%;
 }
 .year-select {
-    padding: 6px 12px;
-    border-radius: 8px;
+    width:100%;
+    padding: 7px 10px;
+    border-radius: 9px;
     font-size: 13px;
     font-weight: 600;
-    border: 1.5px solid #e5e7eb;
-    background: #fff;
-    color: var(--color-text-primary, #1f293b);
+    border: 1px solid rgba(255,255,255,.16);
+    background: rgba(255,255,255,.95);
+    color: #334155;
     cursor: pointer;
     outline: none;
-    font-family: 'Quicksand', sans-serif;
+    font-family: 'Inter', sans-serif;
     transition: all 0.15s;
 }
 .year-select:focus {
@@ -600,4 +615,5 @@ async function copyTable() {
     from { opacity: 0; transform: translateY(12px); }
     to   { opacity: 1; transform: translateY(0); }
 }
+@media(max-width:640px){.dashboard-hero{align-items:flex-start;flex-direction:column;padding:23px 20px}.year-control{width:100%}.dashboard-welcome h2{font-size:20px}}
 </style>
