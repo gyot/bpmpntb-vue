@@ -16,7 +16,7 @@ class LayananController extends Controller
 
     public function publicIndex()
     {
-        return response()->json(Layanan::where('status', 1)->orderBy('order')->get(['id', 'title', 'image', 'link_type', 'link_url', 'link_post_jenis', 'link_post_id', 'slug', 'tags', 'order']));
+        return response()->json(Layanan::where('status', 1)->orderBy('order')->get(['id', 'title', 'jenis_layanan', 'image', 'link_type', 'link_url', 'link_post_jenis', 'link_post_id', 'slug', 'tags', 'order']));
     }
 
     public function show(int $id)
@@ -30,9 +30,22 @@ class LayananController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
+            'jenis_layanan' => 'required|in:standar_pelayanan,layanan_tambahan',
             'image' => 'nullable|image|mimes:jpg,jpeg,png,webp,svg|max:2048',
             'content' => 'nullable|string',
             'pos_file' => 'nullable|file|mimes:pdf|max:20480',
+            'file_pendukung' => 'nullable|file|mimes:pdf|max:20480',
+            'url_permohonan' => 'nullable|url|max:1000',
+            'requirements' => 'nullable|array|max:20',
+            'requirements.*.icon' => 'required_with:requirements|string|max:50',
+            'requirements.*.text' => 'required_with:requirements|string|max:500',
+            'flow' => 'nullable|array|max:20',
+            'flow.*.icon' => 'required_with:flow|string|max:50',
+            'flow.*.title' => 'required_with:flow|string|max:500',
+            'information' => 'nullable|array',
+            'information.duration' => 'nullable|string|max:255',
+            'information.price' => 'nullable|string|max:255',
+            'information.product' => 'nullable|string|max:500',
             'tags' => 'nullable|string|max:500',
             'writer' => 'nullable|string|max:255',
             'tanggal' => 'nullable|date',
@@ -47,6 +60,7 @@ class LayananController extends Controller
         if (!empty($validated['content'])) {
             $validated['content'] = $this->sanitizeContent($validated['content']);
         }
+        $this->normalizeStandardData($validated);
 
         if ($request->hasFile('image')) {
             $ext = strtolower($request->file('image')->getClientOriginalExtension());
@@ -66,6 +80,10 @@ class LayananController extends Controller
             $validated['pos_file'] = $filename;
         }
 
+        if ($request->hasFile('file_pendukung')) {
+            $validated['file_pendukung'] = $this->storePdf($request->file('file_pendukung'));
+        }
+
         $validated['order'] = Layanan::max('order') + 1;
 
         return response()->json(Layanan::create($validated), 201);
@@ -77,9 +95,22 @@ class LayananController extends Controller
 
         $validated = $request->validate([
             'title' => 'required|string|max:255',
+            'jenis_layanan' => 'required|in:standar_pelayanan,layanan_tambahan',
             'image' => 'nullable|image|mimes:jpg,jpeg,png,webp,svg|max:2048',
             'content' => 'nullable|string',
             'pos_file' => 'nullable|file|mimes:pdf|max:20480',
+            'file_pendukung' => 'nullable|file|mimes:pdf|max:20480',
+            'url_permohonan' => 'nullable|url|max:1000',
+            'requirements' => 'nullable|array|max:20',
+            'requirements.*.icon' => 'required_with:requirements|string|max:50',
+            'requirements.*.text' => 'required_with:requirements|string|max:500',
+            'flow' => 'nullable|array|max:20',
+            'flow.*.icon' => 'required_with:flow|string|max:50',
+            'flow.*.title' => 'required_with:flow|string|max:500',
+            'information' => 'nullable|array',
+            'information.duration' => 'nullable|string|max:255',
+            'information.price' => 'nullable|string|max:255',
+            'information.product' => 'nullable|string|max:500',
             'tags' => 'nullable|string|max:500',
             'writer' => 'nullable|string|max:255',
             'tanggal' => 'nullable|date',
@@ -93,6 +124,11 @@ class LayananController extends Controller
         $validated['slug'] = Str::slug($request->title);
         if (!empty($validated['content'])) {
             $validated['content'] = $this->sanitizeContent($validated['content']);
+        }
+        $this->normalizeStandardData($validated);
+        if ($validated['jenis_layanan'] !== 'standar_pelayanan') {
+            $this->deleteUpload($item->file_pendukung);
+            $validated['file_pendukung'] = null;
         }
 
         if ($request->hasFile('image')) {
@@ -117,6 +153,11 @@ class LayananController extends Controller
             $validated['pos_file'] = $filename;
         }
 
+        if ($request->hasFile('file_pendukung')) {
+            $this->deleteUpload($item->file_pendukung);
+            $validated['file_pendukung'] = $this->storePdf($request->file('file_pendukung'));
+        }
+
         $item->update($validated);
         return response()->json($item);
     }
@@ -126,6 +167,8 @@ class LayananController extends Controller
         $item = Layanan::findOrFail($id);
         $old = public_path('upload/layanans/' . $item->image);
         if ($item->image && file_exists($old)) unlink($old);
+        $this->deleteUpload($item->pos_file);
+        $this->deleteUpload($item->file_pendukung);
         $item->delete();
         return response()->json(['message' => 'Layanan berhasil dihapus']);
     }
@@ -147,5 +190,36 @@ class LayananController extends Controller
         $clean = preg_replace('/on\w+\s*=\s*["\'][^"\']*["\']/i', '', $clean);
         $clean = preg_replace('/javascript:/i', '', $clean);
         return $clean;
+    }
+
+    private function normalizeStandardData(array &$validated): void
+    {
+        if (($validated['jenis_layanan'] ?? null) !== 'standar_pelayanan') {
+            $validated['requirements'] = null;
+            $validated['flow'] = null;
+            $validated['information'] = null;
+            $validated['url_permohonan'] = null;
+            return;
+        }
+
+        $validated['requirements'] = array_values($validated['requirements'] ?? []);
+        $validated['flow'] = array_values($validated['flow'] ?? []);
+        $validated['information'] = $validated['information'] ?? [];
+    }
+
+    private function storePdf($file): string
+    {
+        $filename = Str::random(20) . '.pdf';
+        $uploadDir = public_path('upload/layanans');
+        if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
+        $file->move($uploadDir, $filename);
+        return $filename;
+    }
+
+    private function deleteUpload(?string $filename): void
+    {
+        if (!$filename) return;
+        $path = public_path('upload/layanans/' . $filename);
+        if (file_exists($path)) unlink($path);
     }
 }

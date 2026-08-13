@@ -7,8 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 class Layanan extends Model
 {
     protected $table = 'layanans';
-    protected $fillable = ['title', 'image', 'content', 'pos_file', 'slug', 'tags', 'writer', 'tanggal', 'link_type', 'link_url', 'link_post_jenis', 'link_post_id', 'order', 'status'];
-    protected $casts = ['tanggal' => 'date'];
+    protected $fillable = ['title', 'jenis_layanan', 'image', 'content', 'requirements', 'flow', 'information', 'pos_file', 'file_pendukung', 'url_permohonan', 'slug', 'tags', 'writer', 'tanggal', 'link_type', 'link_url', 'link_post_jenis', 'link_post_id', 'order', 'status'];
+    protected $casts = [
+        'tanggal' => 'date',
+        'requirements' => 'array',
+        'flow' => 'array',
+        'information' => 'array',
+    ];
 
     public function teaser()
     {

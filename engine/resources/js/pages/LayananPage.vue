@@ -55,6 +55,7 @@
                             </div>
                         </div>
                         <div class="p-6">
+                            <span class="inline-flex items-center gap-1.5 mb-3 px-2.5 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider" :style="svc.jenis_layanan==='standar_pelayanan'?'background:#eff6ff;color:#1d4ed8':'background:#f1f5f9;color:#64748b'"><i :class="svc.jenis_layanan==='standar_pelayanan'?'fas fa-shield-check':'fas fa-puzzle-piece'"></i>{{ svc.jenis_layanan==='standar_pelayanan'?'Standar Pelayanan':'Layanan Tambahan' }}</span>
                             <h3 class="text-base font-bold mb-2 group-hover:text-[var(--color-primary)] transition-colors" style="color:#37474F">{{ svc.title }}</h3>
                             <p class="text-sm leading-relaxed" style="color:var(--color-text-secondary)">Layanan penjaminan mutu pendidikan dari BPMP Provinsi NTB untuk masyarakat Nusa Tenggara Barat.</p>
                             <span class="inline-flex items-center gap-1.5 text-sm font-semibold mt-4 group-hover:gap-2.5 transition-all" style="color:var(--color-primary)">Selengkapnya <i class="fas fa-arrow-right text-[10px]"></i></span>

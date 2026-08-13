@@ -1,7 +1,7 @@
 <?php
 namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
-use App\Models\{PpidProfile, PpidInformation, PpidStandard, PpidRegulation, PpidExternalLink, PpidAnnualReport};
+use App\Models\{Layanan, PpidProfile, PpidInformation, PpidStandard, PpidRegulation, PpidExternalLink, PpidAnnualReport};
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -17,7 +17,10 @@ class PpidController extends Controller
             "serta_merta" => PpidInformation::where("category","serta_merta")->where("status",1)->orderBy("order")->get(),
             "informasi" => PpidInformation::where("category","informasi")->where("status",1)->orderBy("order")->get(),
         ];
-        $standards = PpidStandard::where("status",1)->orderBy("order")->get();
+        $standards = Layanan::where("status", 1)
+            ->where("jenis_layanan", "standar_pelayanan")
+            ->orderBy("order")
+            ->get(["id", "title", "slug", "image", "requirements", "flow", "information"]);
         $regulations = PpidRegulation::where("status",1)->orderBy("order")->get();
         $externalLinks = PpidExternalLink::where("status",1)->orderBy("order")->get();
         $annualReports = PpidAnnualReport::where("status",1)->orderBy("order")->get();

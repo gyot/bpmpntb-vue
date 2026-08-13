@@ -77,11 +77,8 @@
                         </section>
 
                         <section v-if="activeTab==='standar'" class="tab-panel">
-                            <template v-if="!viewStd">
-                                <header class="section-header"><div><span>Kualitas Pelayanan</span><h2>Standar Pelayanan</h2><p>Ketentuan dan prosedur yang menjadi acuan dalam setiap layanan.</p></div><div class="section-number">05</div></header>
-                                <div v-if="standards.length" class="standard-grid"><button v-for="(standard,index) in standards" :key="standard.id" @click="viewStd=standard" class="standard-card"><span>{{ String(index+1).padStart(2,'0') }}</span><div><i class="fas fa-clipboard-check"></i><h3>{{ standard.title }}</h3><small>Lihat standar dan prosedur</small></div><i class="fas fa-arrow-right"></i></button></div><EmptyState v-else icon="fas fa-clipboard-list" title="Belum ada standar pelayanan" />
-                            </template>
-                            <article v-else class="standard-detail"><button @click="viewStd=null" class="back-button"><i class="fas fa-arrow-left"></i>Kembali</button><header><span><i class="fas fa-file-shield"></i></span><div><small>Standar Pelayanan</small><h2>{{ viewStd.title }}</h2></div></header><div v-if="viewStd.content" class="editorial-content" v-html="viewStd.content"></div><a v-if="viewStd.file" :href="'/upload/ppid/'+viewStd.file" target="_blank" rel="noopener noreferrer" class="btn-primary"><i class="fas fa-file-pdf"></i>Lihat Dokumen POS</a></article>
+                            <header class="section-header"><div><span>Kualitas Pelayanan</span><h2>Standar Pelayanan</h2><p>Ketentuan, persyaratan, alur, waktu, biaya, dan produk pada setiap layanan resmi BPMP Provinsi NTB.</p></div><div class="section-number">05</div></header>
+                            <div v-if="standards.length" class="standard-grid"><router-link v-for="(standard,index) in standards" :key="standard.id" :to="`/layanan/${standard.id}/${standard.slug}`" class="standard-card"><span>{{ String(index+1).padStart(2,'0') }}</span><div><i class="fas fa-clipboard-check"></i><h3>{{ standard.title }}</h3><small>{{ standard.requirements?.length||0 }} persyaratan · {{ standard.flow?.length||0 }} tahapan</small></div><i class="fas fa-arrow-right"></i></router-link></div><EmptyState v-else icon="fas fa-clipboard-list" title="Belum ada standar pelayanan" />
                         </section>
 
                         <section v-if="activeTab==='regulasi'" class="tab-panel">
@@ -120,7 +117,7 @@ import api from '@/bootstrap.js';
 import PublicLayout from '@/layouts/PublicLayout.vue';
 
 const EmptyState = defineComponent({ props:{icon:String,title:String}, setup(props){ return()=>h('div',{class:'empty-state'},[h('span',{},[h('i',{class:props.icon})]),h('h3',{},props.title),h('p',{},'Konten akan ditampilkan setelah data tersedia.')]); }});
-const activeTab=ref('profil'); const loading=ref(true); const profile=ref(null); const informations=ref({berkala:[],setiap_saat:[],serta_merta:[]}); const allInformations=ref([]); const standards=ref([]); const regulations=ref([]); const annualReports=ref([]); const externalLinks=ref([]); const setting=ref(null); const viewStd=ref(null); const regSearch=ref('');
+const activeTab=ref('profil'); const loading=ref(true); const profile=ref(null); const informations=ref({berkala:[],setiap_saat:[],serta_merta:[]}); const allInformations=ref([]); const standards=ref([]); const regulations=ref([]); const annualReports=ref([]); const externalLinks=ref([]); const setting=ref(null); const regSearch=ref('');
 const informationCount=computed(()=>new Set(Object.values(informations.value||{}).flatMap(list=>Array.isArray(list)?list.map(item=>item.id):[])).size);
 const requestEmail=computed(()=>profile.value?.permohonan_email||setting.value?.email||'ntblpmp@gmail.com');
 const requestPhone=computed(()=>profile.value?.permohonan_phone||setting.value?.phone||'0811-390-6669');
@@ -130,7 +127,7 @@ const tabs=[
     {id:'informasi',label:'Informasi',short:'Publik',icon:'fas fa-folder-open'}, {id:'standar',label:'Standar',short:'Layanan',icon:'fas fa-clipboard-check'}, {id:'regulasi',label:'Regulasi',short:'Hukum',icon:'fas fa-scale-balanced'},
     {id:'laporan',label:'Laporan',short:'Tahunan',icon:'fas fa-file-lines'}, {id:'maklumat',label:'Maklumat',short:'Komitmen',icon:'fas fa-scroll'}, {id:'permohonan',label:'Permohonan',short:'Ajukan',icon:'fas fa-paper-plane'},
 ];
-function setTab(id){activeTab.value=id;viewStd.value=null;requestAnimationFrame(()=>document.querySelector('.ppid-tabs')?.scrollIntoView({behavior:'smooth',block:'start'}));}
+function setTab(id){activeTab.value=id;requestAnimationFrame(()=>document.querySelector('.ppid-tabs')?.scrollIntoView({behavior:'smooth',block:'start'}));}
 function getYear(tgl){if(!tgl)return'';const d=new Date(tgl);return isNaN(d)?String(tgl).substring(0,4):d.getFullYear();}
 function documentIcon(doc){if(doc.file?.toLowerCase().endsWith('.pdf'))return'fas fa-file-pdf';if(doc.link)return'fas fa-link';return'fas fa-file-lines';}
 onMounted(async()=>{const[ppid,st]=await Promise.allSettled([api.get('/ppid'),api.get('/settings')]);if(ppid.status==='fulfilled'){const d=ppid.value.data;profile.value=d.profile;informations.value=d.informations||{};allInformations.value=d.informations?.informasi||[];standards.value=d.standards||[];regulations.value=d.regulations||[];annualReports.value=d.annualReports||[];externalLinks.value=d.externalLinks||[];}if(st.status==='fulfilled')setting.value=st.value.data;loading.value=false;});

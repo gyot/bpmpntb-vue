@@ -13,6 +13,13 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div><label class="input-label">Judul Layanan *</label><input v-model="form.title" type="text" class="input-field" required></div>
                 <div>
+                    <label class="input-label">Jenis Layanan *</label>
+                    <select v-model="form.jenis_layanan" class="input-field">
+                        <option value="standar_pelayanan">Standar Pelayanan</option>
+                        <option value="layanan_tambahan">Layanan Tambahan</option>
+                    </select>
+                </div>
+                <div>
                     <label class="input-label">Jenis Link *</label>
                     <select v-model="form.link_type" class="input-field">
                         <option value="post">Halaman Sendiri (Konten)</option>
@@ -63,6 +70,49 @@
                 <p class="text-xs mt-1" style="color:var(--color-text-secondary)"><i class="fas fa-info-circle mr-1"></i>Paste gambar langsung ke editor untuk upload</p>
             </div>
 
+            <section v-if="form.jenis_layanan==='standar_pelayanan'" class="standard-fields">
+                <div class="standard-heading"><div><small>Infografis Layanan</small><h3>Data Standar Pelayanan</h3><p>Informasi ini ditampilkan setelah konten utama pada halaman publik.</p></div><i class="fas fa-shield-check"></i></div>
+
+                <div class="standard-block">
+                    <div class="block-title"><div><span>01</span><div><h4>Persyaratan</h4><p>Dokumen atau ketentuan yang harus disiapkan pemohon.</p></div></div><button type="button" @click="addRequirement"><i class="fas fa-plus"></i>Tambah</button></div>
+                    <div v-if="form.requirements.length" class="dynamic-list">
+                        <div v-for="(requirement,index) in form.requirements" :key="index" class="dynamic-row">
+                            <select v-model="requirement.icon" class="input-field"><option v-for="icon in iconOptions" :key="icon.value" :value="icon.value">{{ icon.label }}</option></select>
+                            <input v-model="requirement.text" type="text" class="input-field" placeholder="Contoh: Surat permohonan resmi">
+                            <button type="button" @click="form.requirements.splice(index,1)" aria-label="Hapus persyaratan"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div><p v-else class="empty-dynamic">Belum ada persyaratan.</p>
+                </div>
+
+                <div class="standard-block">
+                    <div class="block-title"><div><span>02</span><div><h4>Alur Pelayanan</h4><p>Tahapan pelayanan sesuai urutan proses.</p></div></div><button type="button" @click="addFlow"><i class="fas fa-plus"></i>Tambah</button></div>
+                    <div v-if="form.flow.length" class="dynamic-list">
+                        <div v-for="(step,index) in form.flow" :key="index" class="dynamic-row">
+                            <select v-model="step.icon" class="input-field"><option v-for="icon in iconOptions" :key="icon.value" :value="icon.value">{{ icon.label }}</option></select>
+                            <input v-model="step.title" type="text" class="input-field" placeholder="Contoh: ULT memeriksa dokumen">
+                            <button type="button" @click="form.flow.splice(index,1)" aria-label="Hapus tahapan"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div><p v-else class="empty-dynamic">Belum ada alur pelayanan.</p>
+                </div>
+
+                <div class="standard-block">
+                    <div class="block-title"><div><span>03</span><div><h4>Informasi Utama</h4><p>Jangka waktu, biaya, dan produk yang diterima.</p></div></div></div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div><label class="input-label">Jangka Waktu</label><input v-model="form.information.duration" class="input-field" placeholder="Maksimal 5 hari kerja"></div>
+                        <div><label class="input-label">Biaya / Tarif</label><input v-model="form.information.price" class="input-field" placeholder="Gratis / Tidak dipungut biaya"></div>
+                        <div><label class="input-label">Produk Layanan</label><input v-model="form.information.product" class="input-field" placeholder="Data dan informasi mutu pendidikan"></div>
+                    </div>
+                </div>
+
+                <div class="standard-block">
+                    <div class="block-title"><div><span>04</span><div><h4>Dokumen dan Permohonan</h4><p>File pendukung serta tautan formulir layanan.</p></div></div></div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div><label class="input-label">File Pendukung (PDF)</label><div v-if="supportPreview&&!form.file_pendukung" class="current-file"><i class="fas fa-file-pdf"></i><a :href="supportPreview" target="_blank">Lihat file saat ini</a></div><input type="file" accept=".pdf" class="input-field" @change="e=>form.file_pendukung=e.target.files[0]"></div>
+                        <div><label class="input-label">URL Permohonan</label><input v-model="form.url_permohonan" type="url" class="input-field" placeholder="https://formulir.bpmpntb.id/..."></div>
+                    </div>
+                </div>
+            </section>
+
             <div class="flex gap-2 pt-2 border-t border-gray-100">
                 <button @click="save" :disabled="saving" class="btn-primary"><i :class="saving?'fa-spinner fa-spin':'fa-save'" class="fas mr-2"></i>{{ saving?'Menyimpan...':(editId?'Update':'Simpan') }}</button>
                 <button @click="cancelEdit" class="btn-ghost border border-gray-200">Batal</button>
@@ -84,6 +134,7 @@
                             <i :class="item.link_type==='external'?'fa-external-link-alt':'fa-file-alt'" class="fas mr-1 text-[8px]"></i>
                             {{ item.link_type==='external'?'Eksternal':'Konten' }}
                         </span>
+                        <span class="badge text-[10px]" :class="item.jenis_layanan==='standar_pelayanan'?'badge-success':'badge-primary'">{{ item.jenis_layanan==='standar_pelayanan'?'Standar Pelayanan':'Layanan Tambahan' }}</span>
                         <span v-if="item.link_type==='external'" class="text-[10px] truncate max-w-[200px]" style="color:var(--color-text-secondary)">{{ item.link_url }}</span>
                         <span v-if="item.content" class="badge badge-success text-[10px]"><i class="fas fa-align-left mr-1 text-[8px]"></i>Ada Konten</span>
                         <a v-if="item.pos_file" :href="'/upload/layanans/'+item.pos_file" target="_blank" class="badge badge-primary text-[10px] hover:opacity-80"><i class="fas fa-file-pdf mr-1 text-[8px]"></i>Lihat POS</a>
@@ -110,22 +161,23 @@ import { swalConfirm, swalError, swalSuccess, swalWarning } from '@/swal.js';
 import { loadQuill } from '@/composables/useQuill.js';
 
 const items = ref([]); const editId = ref(null); const saving = ref(false); const showForm = ref(false);
-const imgInput = ref(null); const imagePreview = ref(null); const posPreview = ref(null); const editorRef = ref(null); const editorWrap = ref(null);
+const imgInput = ref(null); const imagePreview = ref(null); const posPreview = ref(null); const supportPreview = ref(null); const editorRef = ref(null); const editorWrap = ref(null);
 const dragIdx = ref(null);
 let quill = null; let activeImg = null; let overlayEl = null; let mousedownHandler = null;
 
-const form = reactive({ title:'', link_type:'post', link_url:'', content:'', pos_file:null, tags:'', writer:'', tanggal:'', status:1, image:null });
+const iconOptions=[{value:'document',label:'Dokumen'},{value:'assignment',label:'Penugasan'},{value:'id-card',label:'Kartu Identitas'},{value:'building',label:'Gedung / ULT'},{value:'clipboard',label:'Pemeriksaan'},{value:'folder',label:'Folder / Persuratan'},{value:'shield',label:'Verifikasi'},{value:'team',label:'Tim'},{value:'document-check',label:'Dokumen Selesai'},{value:'calendar',label:'Kalender'},{value:'location',label:'Lokasi'}];
+const form = reactive({ title:'', jenis_layanan:'layanan_tambahan', link_type:'post', link_url:'', content:'', pos_file:null, file_pendukung:null, url_permohonan:'', requirements:[], flow:[], information:{duration:'',price:'',product:''}, tags:'', writer:'', tanggal:'', status:1, image:null });
 
 async function load(){ try{const{data}=await api.get('/layanans');items.value=data;}catch(e){} }
 
 async function openForm(item=null){
     showForm.value=true;
     if(item){
-        editId.value=item.id;form.title=item.title;form.link_type=item.link_type;form.link_url=item.link_url||'';
-        form.content=item.content||'';form.tags=item.tags||'';form.writer=item.writer||'';form.tanggal=item.tanggal?.substring(0,10)||'';form.status=item.status;form.image=null;form.pos_file=null;
-        imagePreview.value=item.image?`/upload/layanans/${item.image}`:null;posPreview.value=item.pos_file?`/upload/layanans/${item.pos_file}`:null;
+        editId.value=item.id;form.title=item.title;form.jenis_layanan=item.jenis_layanan||'layanan_tambahan';form.link_type=item.link_type;form.link_url=item.link_url||'';
+        form.content=item.content||'';form.tags=item.tags||'';form.writer=item.writer||'';form.tanggal=item.tanggal?.substring(0,10)||'';form.status=item.status;form.image=null;form.pos_file=null;form.file_pendukung=null;form.url_permohonan=item.url_permohonan||'';form.requirements=(item.requirements||[]).map(entry=>({...entry}));form.flow=(item.flow||[]).map(entry=>({...entry}));form.information={duration:'',price:'',product:'',...(item.information||{})};
+        imagePreview.value=item.image?`/upload/layanans/${item.image}`:null;posPreview.value=item.pos_file?`/upload/layanans/${item.pos_file}`:null;supportPreview.value=item.file_pendukung?`/upload/layanans/${item.file_pendukung}`:null;
     }else{
-        editId.value=null;form.title='';form.link_type='post';form.link_url='';form.content='';form.pos_file=null;form.tags='';form.writer='';form.tanggal='';form.status=1;form.image=null;imagePreview.value=null;posPreview.value=null;
+        editId.value=null;form.title='';form.jenis_layanan='layanan_tambahan';form.link_type='post';form.link_url='';form.content='';form.pos_file=null;form.file_pendukung=null;form.url_permohonan='';form.requirements=[];form.flow=[];form.information={duration:'',price:'',product:''};form.tags='';form.writer='';form.tanggal='';form.status=1;form.image=null;imagePreview.value=null;posPreview.value=null;supportPreview.value=null;
     }
     await loadQuill();
     nextTick(()=>setTimeout(initEditor,200));
@@ -138,6 +190,8 @@ function handleDrop(e){const f=e.dataTransfer?.files?.[0];if(f){form.image=f;ima
 function handlePaste(e){const items=e.clipboardData?.items;if(!items)return;for(const i of items)if(i.type.startsWith('image/')){e.preventDefault();form.image=i.getAsFile();imagePreview.value=URL.createObjectURL(form.image);return;}}
 function clearImage(){form.image=null;if(imagePreview.value)URL.revokeObjectURL(imagePreview.value);imagePreview.value=null;if(imgInput.value)imgInput.value.value='';}
 function handlePosDrop(e){const f=e.dataTransfer.files[0];if(f&&f.type==='application/pdf')form.pos_file=f;}
+function addRequirement(){form.requirements.push({icon:'document',text:''});}
+function addFlow(){form.flow.push({icon:'building',title:''});}
 
 async function uploadEditorImage(file){
     try{
@@ -191,7 +245,7 @@ async function save(){
     if(quill)form.content=quill.root.innerHTML;
     saving.value=true;
     const fd=new FormData();
-    fd.append('title',form.title);fd.append('link_type',form.link_type);fd.append('status',form.status);
+    fd.append('title',form.title);fd.append('jenis_layanan',form.jenis_layanan);fd.append('link_type',form.link_type);fd.append('status',form.status);
     if(form.link_url)fd.append('link_url',form.link_url);
     if(form.content)fd.append('content',form.content);
     if(form.tags)fd.append('tags',form.tags);
@@ -199,6 +253,13 @@ async function save(){
     if(form.tanggal)fd.append('tanggal',form.tanggal);
     if(form.image)fd.append('image',form.image);
     if(form.pos_file)fd.append('pos_file',form.pos_file);
+    if(form.jenis_layanan==='standar_pelayanan'){
+        form.requirements.filter(item=>item.text.trim()).forEach((item,index)=>{fd.append(`requirements[${index}][icon]`,item.icon);fd.append(`requirements[${index}][text]`,item.text.trim());});
+        form.flow.filter(item=>item.title.trim()).forEach((item,index)=>{fd.append(`flow[${index}][icon]`,item.icon);fd.append(`flow[${index}][title]`,item.title.trim());});
+        Object.entries(form.information).forEach(([key,value])=>{if(value)fd.append(`information[${key}]`,value);});
+        if(form.file_pendukung)fd.append('file_pendukung',form.file_pendukung);
+        if(form.url_permohonan)fd.append('url_permohonan',form.url_permohonan);
+    }
     try{
         if(editId.value){fd.append('_method','PUT');await api.post(`/layanans/${editId.value}`,fd,{headers:{'Content-Type':'multipart/form-data'}});}
         else await api.post('/layanans',fd,{headers:{'Content-Type':'multipart/form-data'}});
@@ -217,4 +278,7 @@ onMounted(load);
 onBeforeUnmount(destroyEditor);
 </script>
 
-<style scoped>.input-label{@apply block text-xs font-semibold uppercase tracking-wider mb-1.5; color:var(--color-text-secondary);}</style>
+<style scoped>
+.input-label{@apply block text-xs font-semibold uppercase tracking-wider mb-1.5; color:var(--color-text-secondary)}
+.standard-fields{display:grid;gap:16px;margin:22px 0;padding:20px;border:1px solid #bfdbfe;border-radius:20px;background:#f8fbff}.standard-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-bottom:16px;border-bottom:1px solid #dbeafe}.standard-heading small{color:var(--color-primary);font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}.standard-heading h3{margin-top:3px;color:#334155;font-size:18px}.standard-heading p{margin-top:3px;color:#78909c;font-size:11px}.standard-heading>i{display:grid;place-items:center;width:48px;height:48px;border-radius:14px;background:var(--color-primary);color:#fff;font-size:18px}.standard-block{padding:18px;border:1px solid #e2e8f0;border-radius:16px;background:#fff}.block-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:15px}.block-title>div{display:flex;align-items:center;gap:11px}.block-title span{display:grid;place-items:center;width:32px;height:32px;border-radius:10px;background:#eff6ff;color:var(--color-primary);font-size:10px;font-weight:800}.block-title h4{color:#334155;font-size:13px}.block-title p{margin-top:2px;color:#94a3b8;font-size:9px}.block-title button{display:inline-flex;align-items:center;gap:6px;padding:8px 11px;border:0;border-radius:9px;background:#eff6ff;color:var(--color-primary);font-size:10px;font-weight:700;cursor:pointer}.dynamic-list{display:grid;gap:9px}.dynamic-row{display:grid;grid-template-columns:155px minmax(0,1fr) 36px;gap:9px}.dynamic-row>button{border:0;border-radius:10px;background:#fef2f2;color:#ef4444;cursor:pointer}.empty-dynamic{padding:14px;border:1px dashed #cbd5e1;border-radius:12px;color:#94a3b8;font-size:10px;text-align:center}.current-file{display:flex;align-items:center;gap:7px;margin-bottom:7px;color:#2563eb;font-size:10px}.current-file i{color:#ef4444}@media(max-width:640px){.dynamic-row{grid-template-columns:1fr 36px}.dynamic-row select{grid-column:1}.dynamic-row input{grid-column:1}.dynamic-row>button{grid-column:2;grid-row:1/3}}
+</style>
