@@ -35,7 +35,7 @@ Route::middleware(['siamin.auth', 'menu.access:konten,{jenis}'])->group(function
 });
 
 Route::post('/quil-upload-image', [PostController::class, 'uploadImage'])
-    ->middleware(['siamin.auth', 'menu.access:konten|media:layanan']);
+    ->middleware(['siamin.auth']);
 
 Route::get('/kategori/{jenis}', [PostController::class, 'kategoriIndex'])
     ->middleware(['siamin.auth', 'menu.access:kategori|konten,{jenis}']);
