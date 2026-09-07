@@ -122,6 +122,38 @@ Route::middleware(['siamin.auth', 'menu.access:chatbot,analytics'])->prefix('api
     Route::post('/analytics/user-usage/{userId}/reset-quota', [ChatbotController::class, 'resetUserTokenQuota']);
 });
 
-Route::get('/{any?}', function () {
-    return view('app');
+Route::get('/{any?}', function (\Illuminate\Http\Request $request) {
+    $og = [];
+    $path = $request->path();
+
+    if (preg_match('#^post/([^/]+)/(\d+)(?:/[^/]*)?$#', $path, $m)) {
+        [$_, $jenis, $id] = $m;
+        $allowed = ['berita','artikel','buletin','jurnal','kliping','pengumuman','galeri','unduhan','profil','lakin','renstra','perjanjian_kinerja'];
+        if (in_array($jenis, $allowed)) {
+            $post = DB::table($jenis)->where('id', $id)->where('status', 1)->first();
+            if ($post) {
+                $baseUrl = config('app.url');
+                $og['title'] = $post->title;
+                $og['description'] = mb_substr(strip_tags($post->content ?? ''), 0, 160);
+                $og['url'] = $baseUrl . '/' . $path;
+                $og['type'] = 'article';
+                if ($post->images) {
+                    $og['image'] = $baseUrl . '/upload/' . $jenis . '/' . $post->images;
+                }
+            }
+        }
+    } elseif (preg_match('#^layanan/(\d+)(?:/[^/]*)?$#', $path, $m)) {
+        $layanan = DB::table('layanans')->where('id', $m[1])->first();
+        if ($layanan) {
+            $baseUrl = config('app.url');
+            $og['title'] = $layanan->title . ' - BPMP Provinsi NTB';
+            $og['description'] = 'Layanan penjaminan mutu pendidikan dari BPMP Provinsi NTB untuk masyarakat Nusa Tenggara Barat.';
+            $og['url'] = $baseUrl . '/' . $path;
+            if ($layanan->image) {
+                $og['image'] = $baseUrl . '/upload/layanans/' . $layanan->image;
+            }
+        }
+    }
+
+    return view('app', $og);
 })->where('any', '.*');

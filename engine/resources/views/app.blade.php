@@ -5,27 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="theme-color" content="#2563eb">
-    <title>@yield('title', 'BPMP Provinsi NTB - Balai Penjaminan Mutu Pendidikan')</title>
-    <meta name="description" content="@yield('description', 'Balai Penjaminan Mutu Pendidikan Provinsi Nusa Tenggara Barat. Bersama menjamin mutu, melayani sepenuh hati. Layanan penjaminan mutu pendidikan untuk masyarakat NTB.')">
-    <meta name="keywords" content="@yield('keywords', 'BPMP, NTB, penjaminan mutu pendidikan, Nusa Tenggara Barat, pendidikan, layanan publik, PPID')">
+    <title>{{ $title ?? 'BPMP Provinsi NTB - Balai Penjaminan Mutu Pendidikan' }}</title>
+    <meta name="description" content="{{ $description ?? 'Balai Penjaminan Mutu Pendidikan Provinsi Nusa Tenggara Barat. Bersama menjamin mutu, melayani sepenuh hati. Layanan penjaminan mutu pendidikan untuk masyarakat NTB.' }}">
+    <meta name="keywords" content="BPMP, NTB, penjaminan mutu pendidikan, Nusa Tenggara Barat, pendidikan, layanan publik, PPID">
     <meta name="author" content="BPMP Provinsi NTB">
     <meta name="robots" content="index, follow">
-    <link rel="canonical" href="@yield('canonical', 'https://bpmpntb.kemendikdasmen.go.id')">
+    <link rel="canonical" href="{{ $url ?? 'https://bpmpntb.kemendikdasmen.go.id' }}">
 
-    <meta property="og:type" content="website">
+    <meta property="og:type" content="{{ $type ?? 'website' }}">
     <meta property="og:site_name" content="BPMP Provinsi NTB">
-    <meta property="og:title" content="@yield('og_title', 'BPMP Provinsi NTB - Balai Penjaminan Mutu Pendidikan')">
-    <meta property="og:description" content="@yield('og_description', 'Balai Penjaminan Mutu Pendidikan Provinsi Nusa Tenggara Barat. Layanan penjaminan mutu pendidikan untuk masyarakat NTB.')">
-    <meta property="og:url" content="@yield('og_url', 'https://bpmpntb.kemendikdasmen.go.id')">
-    <meta property="og:image" content="@yield('og_image', 'https://bpmpntb.kemendikdasmen.go.id/kantor_depan.jpg')">
+    <meta property="og:title" content="{{ $title ?? 'BPMP Provinsi NTB - Balai Penjaminan Mutu Pendidikan' }}">
+    <meta property="og:description" content="{{ $description ?? 'Balai Penjaminan Mutu Pendidikan Provinsi Nusa Tenggara Barat. Layanan penjaminan mutu pendidikan untuk masyarakat NTB.' }}">
+    <meta property="og:url" content="{{ $url ?? 'https://bpmpntb.kemendikdasmen.go.id' }}">
+    <meta property="og:image" content="{{ $image ?? 'https://bpmpntb.kemendikdasmen.go.id/kantor_depan.jpg' }}">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:locale" content="id_ID">
 
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="@yield('twitter_title', 'BPMP Provinsi NTB')">
-    <meta name="twitter:description" content="@yield('twitter_description', 'Balai Penjaminan Mutu Pendidikan Provinsi Nusa Tenggara Barat')">
-    <meta name="twitter:image" content="@yield('twitter_image', 'https://bpmpntb.kemendikdasmen.go.id/kantor_depan.jpg')">
+    <meta name="twitter:title" content="{{ $title ?? 'BPMP Provinsi NTB' }}">
+    <meta name="twitter:description" content="{{ $description ?? 'Balai Penjaminan Mutu Pendidikan Provinsi Nusa Tenggara Barat' }}">
+    <meta name="twitter:image" content="{{ $image ?? 'https://bpmpntb.kemendikdasmen.go.id/kantor_depan.jpg' }}">
 
     <link rel="manifest" href="/manifest.json">
     <meta name="mobile-web-app-capable" content="yes">
