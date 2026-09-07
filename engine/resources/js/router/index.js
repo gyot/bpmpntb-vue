@@ -7,6 +7,7 @@ const routes = [
     { path: '/post/:jenis', name: 'post-list', component: () => import('@/pages/PostList.vue') },
     { path: '/post/:jenis/:id/:slug?', name: 'post-detail', component: () => import('@/pages/PostDetail.vue') },
     { path: '/layanan/:id/:slug?', name: 'layanan-detail', component: () => import('@/pages/LayananDetail.vue') },
+    { path: '/akuntabilitas', name: 'akuntabilitas', component: () => import('@/pages/AkuntabilitasPage.vue') },
     { path: '/ppid', name: 'ppid', component: () => import('@/pages/PpidPage.vue') },
     { path: '/login', name: 'login', component: () => import('@/pages/Login.vue') },
     {

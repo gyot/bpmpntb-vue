@@ -16,6 +16,7 @@
                     <nav class="hidden lg:flex items-center gap-1" role="navigation" aria-label="Navigasi utama">
                         <router-link to="/" class="nav-link" :class="{'nav-link-active': isHome}">Beranda</router-link>
                         <router-link to="/ppid" class="nav-link" :class="{'nav-link-active': isPpid}">PPID</router-link>
+                        <router-link to="/akuntabilitas" class="nav-link" :class="{'nav-link-active': isAkuntabilitas}">Akuntabilitas</router-link>
                         <div class="relative group">
                             <a href="#" class="nav-link" @click.prevent>Profil <i class="fas fa-chevron-down text-[9px] ml-1 opacity-40 transition-transform duration-200 group-hover:rotate-180"></i></a>
                             <div class="dropdown">
@@ -114,6 +115,9 @@
                             </router-link>
                             <router-link to="/ppid" @click="closeMobile" class="mm-item" :class="{'mm-active': isPpid}">
                                 <i class="fas fa-building mm-icon"></i><span>PPID</span>
+                            </router-link>
+                            <router-link to="/akuntabilitas" @click="closeMobile" class="mm-item" :class="{'mm-active': isAkuntabilitas}">
+                                <i class="fas fa-chart-line mm-icon"></i><span>Akuntabilitas</span>
                             </router-link>
                             <div v-if="profil.length">
                                 <button @click="toggleAccordion('profil')" class="mm-item mm-parent">
@@ -302,6 +306,7 @@ const mapLoaded = ref(false);
 
 const isHome = computed(() => route.path === '/');
 const isPpid = computed(() => route.path.startsWith('/ppid'));
+const isAkuntabilitas = computed(() => route.path.startsWith('/akuntabilitas'));
 const navItems = computed(() => {
     try {
         const raw = JSON.parse(setting.value?.navigations || '[]');
