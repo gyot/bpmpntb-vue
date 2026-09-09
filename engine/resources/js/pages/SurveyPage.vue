@@ -166,14 +166,14 @@ const SPREADSHEET_ID = '1DI1wH0rIkDW2MksadViG-a4TwBR48MItJ5yrnO317_Q';
 const IKM_SHEET = 'KONVERSI NILAI';
 const PROFILE_SHEET = 'DB';
 const REPORT_SHEET = 'Laporan';
-const WEIGHT = 0.111;
+const TARGETS = ['Persyaratan','Prosedur','Waktu Pelayanan','Biaya','Akses Layanan','Kesesuaian Produk Layanan','Kompetensi Pelaksana','Perilaku Pelaksana','Kualitas Sarana dan Prasarana','Penanganan Pengaduan'];
+const WEIGHT = 1/TARGETS.length;
 const QUARTERS = [
     { quarter: 1, periodLabel: 'Januari - Maret' },
     { quarter: 2, periodLabel: 'April - Juni' },
     { quarter: 3, periodLabel: 'Juli - September' },
     { quarter: 4, periodLabel: 'Oktober - Desember' },
 ];
-const TARGETS = ['Persyaratan','Prosedur','Waktu Pelayanan','Akses Layanan','Kesesuaian Produk Layanan','Kompetensi Pelaksana','Perilaku Pelaksana','Kualitas Sarana dan Prasarana','Penanganan Pengaduan'];
 const GENDER_ORDER = ['Laki-Laki','Perempuan','Tidak Diisi'];
 const EDUCATION_ORDER = ['SD','SMP','SMA/SMK/MA','Diploma','S1','S2','S3','Tidak Diisi'];
 const RESPONDENT_ORDER = ['Guru','Kepala Sekolah','Pengawas Sekolah','Tenaga Kependidikan','Pegawai Dinas Pendidikan dan Kebudayaan','Pegawai Bappeda/Bapperida','Pegawai BKD','Pegawai Dinas Kesehatan','Dosen / Akademisi','Peserta Didik / Mahasiswa','Masyarakat Umum / Lainnya','Tidak Diisi'];
