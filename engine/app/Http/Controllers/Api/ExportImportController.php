@@ -176,9 +176,12 @@ class ExportImportController extends Controller
             $data = $data->map(function($row) use ($jenis, $baseUrl) {
                 $slug = $row->slug ?? '';
                 $link = $baseUrl . '/post/' . $jenis . '/' . $row->id . '/' . $slug;
-                $row = (array) $row;
-                $row['link'] = $link;
-                return (object) $row;
+                return (object) [
+                    'tanggal' => $row->tanggal ?? '',
+                    'judul' => $row->title ?? '',
+                    'viewer' => $row->viewer ?? 0,
+                    'url' => $link,
+                ];
             });
         }
 
@@ -198,7 +201,7 @@ class ExportImportController extends Controller
                 }
                 $sheet->getStyle('1')->getFont()->setBold(true);
 
-                $linkColIdx = array_search('link', $columns);
+                $linkColIdx = array_search('url', $columns);
 
                 foreach ($data as $rowIdx => $row) {
                     foreach ($columns as $col => $name) {

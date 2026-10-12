@@ -70,6 +70,13 @@ class PostController extends Controller
             $query->where(fn($q) => $q->where('title', 'like', "%$s%")->orWhere('tags', 'like', "%$s%"));
         }
 
+        if ($request->filled('from')) {
+            $query->whereDate('tanggal', '>=', $request->from);
+        }
+        if ($request->filled('to')) {
+            $query->whereDate('tanggal', '<=', $request->to);
+        }
+
         $data = $query->paginate($request->get('per_page', 12));
 
         return response()->json([

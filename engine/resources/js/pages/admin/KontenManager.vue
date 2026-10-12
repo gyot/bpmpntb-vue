@@ -27,6 +27,29 @@
                     <i class="fas" :class="sortDir==='desc'?'fa-sort-amount-down':'fa-sort-amount-up'"></i>
                 </button>
             </div>
+            <div class="px-4 pb-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 border-t border-gray-100 pt-3">
+                <div class="flex items-center gap-2">
+                    <i class="fas fa-calendar-alt text-gray-400 text-sm"></i>
+                    <span class="text-sm font-medium text-gray-600 whitespace-nowrap">Rentang Tanggal</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <input v-model="dateFrom" type="date" class="input-field w-auto" placeholder="Dari tanggal">
+                    <span class="text-gray-400 text-sm">s/d</span>
+                    <input v-model="dateTo" type="date" class="input-field w-auto" placeholder="Sampai tanggal">
+                </div>
+                <div class="flex items-center gap-2">
+                    <button @click="applyDateFilter" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white rounded-lg hover:opacity-90 transition shadow-sm" style="background:var(--color-primary)">
+                        <i class="fas fa-filter mr-2"></i>Tampilkan
+                    </button>
+                    <button v-if="dateFrom||dateTo" @click="resetDateFilter" class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition">
+                        <i class="fas fa-times mr-1.5"></i>Reset
+                    </button>
+                    <button @click="exportExcel" :disabled="exporting"
+                        class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 disabled:opacity-50 transition shadow-sm">
+                        <i :class="exporting?'fa-spinner fa-spin':'fa-file-excel'" class="fas mr-2"></i>{{ exporting?'Mengekspor...':'Export Excel' }}
+                    </button>
+                </div>
+            </div>
         </div>
 
         <div v-if="loading" class="text-center py-16">
@@ -258,6 +281,10 @@ const loading = ref(true);
 const kategoris = ref([]);
 let debounceTimer = null;
 
+const dateFrom = ref('');
+const dateTo = ref('');
+const exporting = ref(false);
+
 const bulan = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
 function formatDate(tgl) { if(!tgl)return'-';const d=new Date(tgl);return isNaN(d)?tgl:`${d.getDate()} ${bulan[d.getMonth()]} ${d.getFullYear()}`; }
 function stripHtml(html) { if(!html)return'';const t=document.createElement('div');t.innerHTML=html;return t.textContent?.substring(0,200)||''; }
@@ -275,12 +302,42 @@ function toggleSortDir() { sortDir.value = sortDir.value==='desc'?'asc':'desc'; 
 async function load(page=1) {
     loading.value = true;
     try {
-        const { data } = await api.get(`/posts/${jenis.value}`, { params:{page,search:search.value,sort_by:sortBy.value,sort_dir:sortDir.value,per_page:12} });
+        const params = { page, search: search.value, sort_by: sortBy.value, sort_dir: sortDir.value, per_page: 12 };
+        if (dateFrom.value) params.from = dateFrom.value;
+        if (dateTo.value) params.to = dateTo.value;
+        const { data } = await api.get(`/posts/${jenis.value}`, { params });
         posts.value = data.data; currentPage.value = data.current_page; lastPage.value = data.last_page; total.value = data.total;
     } catch(e) { console.error(e); posts.value = []; }
     loading.value = false;
 }
 function debounceLoad() { clearTimeout(debounceTimer); debounceTimer = setTimeout(()=>load(), 300); }
+
+function applyDateFilter() { currentPage.value = 1; load(1); }
+function resetDateFilter() { dateFrom.value = ''; dateTo.value = ''; load(1); }
+
+async function exportExcel() {
+    exporting.value = true;
+    try {
+        const params = { format: 'xlsx' };
+        if (dateFrom.value) params.from = dateFrom.value;
+        if (dateTo.value) params.to = dateTo.value;
+        const response = await api.get(`/export-import/konten-${jenis.value}`, { params, responseType: 'blob' });
+        const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        const rangeLabel = dateFrom.value && dateTo.value ? `_${dateFrom.value}_${dateTo.value}` : dateFrom.value ? `_dari_${dateFrom.value}` : dateTo.value ? `_sampai_${dateTo.value}` : '';
+        a.download = `export_${jenis.value}${rangeLabel}_${new Date().toISOString().slice(0,10)}.xlsx`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    } catch(e) {
+        console.error(e);
+        swalError('Gagal mengexport data');
+    }
+    exporting.value = false;
+}
 async function destroy(id) { if(!await swalConfirm('Yakin ingin menghapus data ini?'))return; try{await api.delete(`/posts/${jenis.value}/${id}`);swalSuccess('Data berhasil dihapus');load(currentPage.value);}catch(e){swalError('Gagal menghapus');} }
 
 async function loadKategori() { try{const{data}=await api.get(`/kategori/${jenis.value}`);kategoris.value=data;}catch(e){} }
