@@ -94,8 +94,8 @@
                             <img src="/ikm-2025.png" alt="Indeks Kepuasan Masyarakat" class="h-11 w-18 object-contain" loading="lazy" width="72" height="44" @error="$event.target.style.display='none'">
                         </div>
                         <div class="text-sm font-semibold mb-1" style="color:#455A64">Indeks Kepuasan Masyarakat</div>
-                        <div class="text-4xl font-extrabold" style="color:var(--color-accent)">{{ setting?.ikm_score || '0' }}</div>
-                        <div class="text-xs mt-1" style="color:var(--color-text-secondary)">{{ setting?.ikm_period || '' }}</div>
+                        <div class="text-4xl font-extrabold" style="color:var(--color-accent)">{{ ikmScore !== null ? ikmScore.toFixed(2) : (setting?.ikm_score || '0') }}</div>
+                        <div class="text-xs mt-1" style="color:var(--color-text-secondary)">{{ ikmPeriod || setting?.ikm_period || '' }}</div>
                         <div class="text-xs mt-3 font-semibold" style="color:var(--color-primary)">Beri Penilaian <i class="fas fa-arrow-right text-[9px] ml-1"></i></div>
                     </a>
                 </div>
@@ -303,6 +303,77 @@ const { setting, beranda, layanan, visitorStats, fetchAll } = usePublicData();
 const sliders = computed(() => beranda.value?.sliders || []);
 const lastPost = computed(() => beranda.value?.lastPost || []);
 const externalLinks = computed(() => beranda.value?.externalLinks || []);
+
+const ikmScore = ref(null);
+const ikmPeriod = ref('');
+
+const SPREADSHEET_ID = '1DI1wH0rIkDW2MksadViG-a4TwBR48MItJ5yrnO317_Q';
+const IKM_SHEET = 'KONVERSI NILAI';
+const TARGETS = ['Persyaratan','Sistem, Mekanisme, dan Prosedur','Waktu Pelayanan','Biaya/Tarif','Produk, Spesifikasi, dan Jenis Pelayanan','Kompetensi Pelaksana','Perilaku Pelaksana','Kualitas Sarana dan Prasarana','Penanganan Pengaduan, Saran, dan Masukan'];
+const WEIGHT = 1 / TARGETS.length;
+const QUARTERS = { 1: 'Januari - Maret', 2: 'April - Juni', 3: 'Juli - September', 4: 'Oktober - Desember' };
+
+function parseResp(text) { const s = text.indexOf('{'), e = text.lastIndexOf('}'); if (s === -1 || e === -1) throw new Error('format'); return JSON.parse(text.slice(s, e + 1)); }
+function parseDate(cell) {
+    if (!cell) return null;
+    if (typeof cell.v === 'string') {
+        const m = cell.v.match(/^Date\((\d+),(\d+),(\d+)/);
+        if (m) return new Date(+m[1], +m[2], +m[3]);
+        const d = new Date(cell.v); if (!isNaN(d.getTime())) return d;
+    }
+    return null;
+}
+function colMap(cols) { return cols.reduce((m, c, i) => { const key = (c.label || '').trim(); if (key) m[key] = i; return m; }, {}); }
+function numVal(cell) { if (!cell) return null; if (typeof cell.v === 'number') return cell.v; if (typeof cell.v === 'string') { const n = Number(cell.v.replace(/\./g, '').replace(',', '.')); return Number.isFinite(n) ? n : null; } return null; }
+
+async function fetchIkm() {
+    try {
+        const url = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?sheet=${encodeURIComponent(IKM_SHEET)}&tqx=out:json`;
+        const r = await fetch(url);
+        if (!r.ok) return;
+        const text = await r.text();
+        if (!text.includes('"cols"')) return;
+        const table = parseResp(text).table;
+        const cm = colMap(table.cols);
+        const dateIdx = cm['Tanggal Survei'] ?? cm['Timestamp'] ?? cm['Tanggal'];
+        if (dateIdx === undefined) return;
+        const missing = TARGETS.filter(h => cm[h] === undefined);
+        if (missing.length) return;
+
+        const qd = {};
+        table.rows.forEach(row => {
+            const dt = parseDate(row.c[dateIdx]);
+            if (!dt || isNaN(dt.getTime())) return;
+            const yr = dt.getFullYear(), qr = Math.floor(dt.getMonth() / 3) + 1;
+            if (!qd[yr]) qd[yr] = {};
+            if (!qd[yr][qr]) qd[yr][qr] = [];
+            qd[yr][qr].push(row);
+        });
+
+        let latest = null;
+        const sortedYears = Object.keys(qd).map(Number).sort((a, b) => b - a);
+        for (const yr of sortedYears) {
+            for (const q of [4, 3, 2, 1]) {
+                const rows = qd[yr][q];
+                if (!rows || !rows.length) continue;
+                const idx = TARGETS.reduce((s, h) => {
+                    const ci = cm[h];
+                    const vals = rows.map(r => numVal(r.c[ci])).filter(v => v !== null);
+                    const avg = vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : 0;
+                    return s + avg * WEIGHT;
+                }, 0);
+                latest = { ikm: idx * 25, period: `Triwulan ${q} Tahun ${yr}` };
+                break;
+            }
+            if (latest) break;
+        }
+
+        if (latest) {
+            ikmScore.value = latest.ikm;
+            ikmPeriod.value = latest.period;
+        }
+    } catch (e) { /* fallback to settings */ }
+}
 const slide = ref(0); let timer = null;
 const total = computed(() => sliders.value.length + 1);
 const scrollY = ref(0); const mouseX = ref(0); const mouseY = ref(0);
@@ -336,7 +407,7 @@ const processSteps = [
 const statsData = computed(() => [
     { icon: 'fas fa-users', value: visitorStats.value?.totalVisitors || 0, label: 'Total Pengunjung' },
     { icon: 'fas fa-concierge-bell', value: layanan.value?.length || 0, label: 'Layanan Tersedia' },
-    { icon: 'fas fa-star', value: parseFloat(setting.value?.ikm_score) || 0, label: 'Skor IKM' },
+    { icon: 'fas fa-star', value: ikmScore.value ?? (parseFloat(setting.value?.ikm_score) || 0), label: 'Skor IKM' },
     { icon: 'fas fa-globe', value: visitorStats.value?.onlineVisitors || 0, label: 'Online Saat Ini' },
 ]);
 
@@ -373,6 +444,7 @@ function sectionParallaxStyle(speed, limit) {
 onMounted(async () => {
     window.addEventListener('scroll', onScroll, { passive: true });
     await fetchAll();
+    fetchIkm();
     timer = setInterval(() => { slide.value = (slide.value + 1) % total.value; }, 7000);
     setTimeout(setupReveal, 150);
 });
