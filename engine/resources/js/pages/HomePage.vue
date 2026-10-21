@@ -351,11 +351,13 @@ async function fetchIkm() {
         });
 
         let latest = null;
+        let skip = 1;
         const sortedYears = Object.keys(qd).map(Number).sort((a, b) => b - a);
         for (const yr of sortedYears) {
             for (const q of [4, 3, 2, 1]) {
                 const rows = qd[yr][q];
                 if (!rows || !rows.length) continue;
+                if (skip > 0) { skip--; continue; }
                 const idx = TARGETS.reduce((s, h) => {
                     const ci = cm[h];
                     const vals = rows.map(r => numVal(r.c[ci])).filter(v => v !== null);
@@ -366,6 +368,24 @@ async function fetchIkm() {
                 break;
             }
             if (latest) break;
+        }
+
+        if (!latest && skip > 0) {
+            for (const yr of sortedYears) {
+                for (const q of [4, 3, 2, 1]) {
+                    const rows = qd[yr][q];
+                    if (!rows || !rows.length) continue;
+                    const idx = TARGETS.reduce((s, h) => {
+                        const ci = cm[h];
+                        const vals = rows.map(r => numVal(r.c[ci])).filter(v => v !== null);
+                        const avg = vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : 0;
+                        return s + avg * WEIGHT;
+                    }, 0);
+                    latest = { ikm: idx * 25, period: `Triwulan ${q} Tahun ${yr}` };
+                    break;
+                }
+                if (latest) break;
+            }
         }
 
         if (latest) {
